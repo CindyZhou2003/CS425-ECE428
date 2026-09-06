@@ -1,4 +1,3 @@
-cat << 'EOF' > server.go
 package main
 
 import (
@@ -19,7 +18,7 @@ func runServer(args []string) {
 		logFile = args[1]
 	}
 
-	listener, err := net.Listen("tcp",":"+port)
+	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +26,7 @@ func runServer(args []string) {
 	fmt.Printf("Server listening on port %s for file %s ...\n", port, logFile)
 
 	for {
-		conn, err:= listener.Accept()
+		conn, err := listener.Accept()
 		if err != nil {
 			continue
 		}
@@ -40,7 +39,7 @@ func handleConnection(conn net.Conn, logFile string) {
 
 	reader := bufio.NewReader(conn)
 	reqLine, err := reader.ReadString('\n')
-	if err != nil{
+	if err != nil {
 		return
 	}
 
@@ -69,5 +68,3 @@ func handleConnection(conn net.Conn, logFile string) {
 	response := fmt.Sprintf("[%s] Matches: %d\n%s", logFile, lineCount, outputStr)
 	conn.Write([]byte(response))
 }
-
-EOF

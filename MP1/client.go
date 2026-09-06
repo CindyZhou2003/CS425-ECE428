@@ -2,91 +2,181 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
-// List of target servers (locally simulated via different ports)
-var serverList = []string{
+// hostsFile lets the VM list change without recompiling; the localhost ports
+// below are the fallback for testing several servers on one machine.
+const hostsFile = "host.txt"
+
+var defaultServers = []string{
 	"127.0.0.1:8001",
 	"127.0.0.1:8002",
 	"127.0.0.1:8003",
 }
 
-func runClient(args []string) {
-	if len(args) < 1 {
-		fmt.Println("Usage: mp1 client <pattern>")
-		return
+// loadServers reads one host:port per line, skipping blanks and # comments.
+func loadServers() []string {
+	data, err := os.ReadFile(hostsFile)
+	if err != nil {
+		return defaultServers
 	}
-	pattern := args[0]
-
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	totalLines := 0
-
-	fmt.Printf("--- Querying pattern: %q across %d nodes ---\n\n", pattern, len(serverList))
-
-	for _, addr := range serverList {
-		wg.Add(1)
-		go func(target string) {
-			defer wg.Done()
-			lines := queryNode(target, pattern)
-
-			mu.Lock()
-			totalLines += lines
-			mu.Unlock()
-		}(addr)
+	var servers []string
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" && !strings.HasPrefix(line, "#") {
+			servers = append(servers, line)
+		}
 	}
-
-	wg.Wait()
-	fmt.Printf("\n--- Query Complete: Total matches across all active nodes = %d ---\n", totalLines)
+	if len(servers) == 0 {
+		return defaultServers
+	}
+	return servers
 }
 
-func queryNode(target string, pattern string) int {
+type nodeResult struct {
+	addr    string
+	logFile string
+	matches int
+	lines   string
+	err     error
+}
+
+func runClient(args []string) {
+	// Counts only by default: a broad pattern matches six figures of lines, and
+	// rendering those to a terminal takes far longer than the query itself.
+	// --summary is kept as a no-op since it names what now happens anyway.
+	showLines := false
+	var grepArgs []string
+	for _, a := range args {
+		switch a {
+		case "--lines":
+			showLines = true
+		case "--summary":
+		default:
+			grepArgs = append(grepArgs, a)
+		}
+	}
+	args = grepArgs
+
+	if len(args) < 1 {
+		fmt.Println("Usage: mp1 client [--lines] [grep options...] <pattern>")
+		fmt.Println("  --lines   also print each matching line, tagged with its log file")
+		return
+	}
+
+	// The server derives its match count from how many lines grep printed. These
+	// flags replace those lines with a count, a file name, or nothing, so the
+	// count would come back as 1 or 0 with no sign anything went wrong.
+	for _, a := range args {
+		switch a {
+		case "-c", "--count", "-l", "--files-with-matches",
+			"-L", "--files-without-match", "-q", "--quiet", "--silent":
+			fmt.Printf("error: %s suppresses grep's matching lines, which is how each node counts.\n", a)
+			fmt.Println("Per-node counts are printed by default; drop this flag.")
+			return
+		}
+	}
+
+	serverList := loadServers()
+	fmt.Printf("--- Querying grep %q across %d nodes ---\n\n", args, len(serverList))
+
+	// Each goroutine owns one slot, so the report follows host.txt order rather
+	// than whichever node answered first.
+	results := make([]nodeResult, len(serverList))
+	var wg sync.WaitGroup
+	for i, addr := range serverList {
+		wg.Add(1)
+		go func(slot int, target string) {
+			defer wg.Done()
+			results[slot] = queryNode(target, args)
+		}(i, addr)
+	}
+	wg.Wait()
+
+	// Printing only after every node has answered: concurrent writes to stdout
+	// get split apart once a response outgrows the pipe buffer, which shuffles
+	// one node's matching lines into another's.
+	if showLines {
+		out := bufio.NewWriter(os.Stdout)
+		for _, r := range results {
+			if r.err != nil {
+				continue
+			}
+			// Tag each line with its source, the way grep does when given more
+			// than one file. Base name only: the server is started with an
+			// absolute path, and repeating /home/<netid>/ on every line buries
+			// the part that differs. The table below maps file back to host.
+			name := filepath.Base(r.logFile)
+			for _, line := range strings.Split(strings.TrimSuffix(r.lines, "\n"), "\n") {
+				if line != "" {
+					fmt.Fprintf(out, "%s: %s\n", name, line)
+				}
+			}
+		}
+		out.Flush()
+	}
+
+	total := 0
+	fmt.Printf("\n--- Matches per node ---\n")
+	for _, r := range results {
+		if r.err != nil {
+			fmt.Printf("%-38s %-16s %10s\n", r.addr, "-", "UNREACHABLE")
+			continue
+		}
+		total += r.matches
+		fmt.Printf("%-38s %-16s %10d\n", r.addr, filepath.Base(r.logFile), r.matches)
+	}
+	fmt.Printf("%-38s %-16s %10d\n", "TOTAL", "", total)
+}
+
+func queryNode(target string, grepArgs []string) nodeResult {
+	res := nodeResult{addr: target}
+
 	// Enforce a 2-second timeout to handle down/unresponsive machines gracefully
 	conn, err := net.DialTimeout("tcp", target, 2*time.Second)
 	if err != nil {
-		fmt.Printf("[ERROR] Failed to reach %s (Node down or unreachable)\n", target)
-		return 0
+		res.err = err
+		return res
 	}
 	defer conn.Close()
 
-	// Send pattern ending with newline
-	_, err = conn.Write([]byte(pattern + "\n"))
+	// The server decodes one JSON array per connection, then execs grep with it.
+	payload, err := json.Marshal(grepArgs)
 	if err != nil {
-		fmt.Printf("[ERROR] Failed to send query to %s\n", target)
-		return 0
+		res.err = err
+		return res
+	}
+	if _, err = conn.Write(append(payload, '\n')); err != nil {
+		res.err = err
+		return res
 	}
 
-	// Read full response
 	rawOutput, err := io.ReadAll(conn)
 	if err != nil {
-		fmt.Printf("[ERROR] Failed reading response from %s\n", target)
-		return 0
+		res.err = err
+		return res
+	}
+	if len(rawOutput) == 0 {
+		res.err = fmt.Errorf("empty response")
+		return res
 	}
 
-	outputStr := string(rawOutput)
-	if len(outputStr) == 0 {
-		return 0
+	// The response is "[<logfile>] Matches: <n>" then the matching lines.
+	header, lines, _ := strings.Cut(string(rawOutput), "\n")
+	res.lines = lines
+	if name, count, ok := strings.Cut(header, "] Matches: "); ok {
+		res.logFile = strings.TrimPrefix(name, "[")
+		res.matches, _ = strconv.Atoi(strings.TrimSpace(count))
 	}
-
-	// Print node output directly to terminal
-	fmt.Print(outputStr)
-
-	// Extract match count from the header line: "[machine.x.log] Matches: N"
-	scanner := bufio.NewScanner(strings.NewReader(outputStr))
-	if scanner.Scan() {
-		header := scanner.Text()
-		parts := strings.Split(header, "Matches: ")
-		if len(parts) == 2 {
-			count, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
-			return count
-		}
-	}
-	return 0
+	return res
 }
