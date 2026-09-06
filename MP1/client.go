@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -19,12 +18,12 @@ var serverList = []string{
 	"127.0.0.1:8003",
 }
 
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run client.go <pattern>")
+func runClient(args []string) {
+	if len(args) < 1 {
+		fmt.Println("Usage: mp1 client <pattern>")
 		return
 	}
-	pattern := os.Args[1]
+	pattern := args[0]
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex

@@ -24,7 +24,7 @@ type TestCase struct {
 	ExpectedTotal int
 }
 
-func main() {
+func runTestRunner(args []string) {
 	testCases := []TestCase{
 		{
 			Name:          "Rare Pattern (Single Machine)",
