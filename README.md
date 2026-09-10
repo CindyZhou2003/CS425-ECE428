@@ -49,5 +49,13 @@ gofmt -w .      # format all the files in the directory
 ```
 
 ## Test
+Spawns background servers on local loopback ports to simulate cluster nodes automatically:
 
-`distributed_test`
+```bash
+# Run the entire test suite
+go test -v ./...
+
+# Run specific tests
+go test -v -run TestDistributedGrep
+go test -v -run TestGrepOptions_RegexpFlags
+go test -v -run TestQueryToleratesDownServer
