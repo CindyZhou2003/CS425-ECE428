@@ -88,11 +88,11 @@ func TestDistributedGrep(t *testing.T) {
 
 				// The spec requires matching file names and line counts to be verified.
 				// If your node response struct exposes fileName, uncomment this check:
-				/*
+				
 				if !strings.Contains(res.fileName, expectedFileName) {
 					t.Errorf("Node %s: expected file name %q, got %q", addr, expectedFileName, res.fileName)
 				}
-				*/
+				
 
 				total += res.matches
 			}
@@ -212,7 +212,38 @@ func TestQueryToleratesDownServer(t *testing.T) {
 	if allPattern == nil {
 		t.Fatal("test setup error: FREQ_ALL pattern not found")
 	}
+	clusterAddrs := []string{upAddr, downAddr}
+	totalMatches := 0
+	failedCount := 0
+	clusterAddrs := []string{upAddr, downAddr}
+	totalMatches := 0
+	failedCount := 0
 
+	for _, addr := range clusterAddrs {
+		res := queryNode(addr, []string{"-F", allPattern.phrase})
+		if res.err != nil {
+			// A down server must be captured as an error and must not cause a fatal crash
+			failedCount++
+			t.Logf("Expected failure observed for down server %s: %v", addr, res.err)
+			continue
+		}
+		totalMatches += res.matches
+	}
+
+	// 1. Verify that exactly one failed node is detected
+	if failedCount != 1 {
+		t.Errorf("expected exactly 1 failed node, got %d", failedCount)
+	}
+
+	// 2. Verify that matching counts from surviving nodes are aggregated properly (must be positive and within bounds)
+	if totalMatches <= 0 {
+		t.Errorf("expected survivor node to yield matches, got %d", totalMatches)
+	}
+	if totalMatches > wantCounts[allPattern.id] {
+		t.Errorf("survivor matches %d exceeded expected upper bound %d",
+			totalMatches, wantCounts[allPattern.id])
+	}
+	
 	// Live node must succeed
 	upRes := queryNode(upAddr, []string{"-F", allPattern.phrase})
 	if upRes.err != nil {
