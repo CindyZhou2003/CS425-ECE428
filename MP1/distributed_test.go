@@ -215,9 +215,6 @@ func TestQueryToleratesDownServer(t *testing.T) {
 	clusterAddrs := []string{upAddr, downAddr}
 	totalMatches := 0
 	failedCount := 0
-	clusterAddrs := []string{upAddr, downAddr}
-	totalMatches := 0
-	failedCount := 0
 
 	for _, addr := range clusterAddrs {
 		res := queryNode(addr, []string{"-F", allPattern.phrase})
@@ -242,27 +239,6 @@ func TestQueryToleratesDownServer(t *testing.T) {
 	if totalMatches > wantCounts[allPattern.id] {
 		t.Errorf("survivor matches %d exceeded expected upper bound %d",
 			totalMatches, wantCounts[allPattern.id])
-	}
-	
-	// Live node must succeed
-	upRes := queryNode(upAddr, []string{"-F", allPattern.phrase})
-	if upRes.err != nil {
-		t.Fatalf("query to live server failed: %v", upRes.err)
-	}
-
-	// Down node must report an error without crashing the caller
-	downRes := queryNode(downAddr, []string{"-F", allPattern.phrase})
-	if downRes.err == nil {
-		t.Fatalf("expected an error querying an unreachable server, got none")
-	}
-
-	// Verification of count validity on the surviving node
-	if upRes.matches <= 0 {
-		t.Errorf("expected live server to report positive matches, got %d", upRes.matches)
-	}
-	if upRes.matches > wantCounts[allPattern.id] {
-		t.Errorf("live server reported %d matches, exceeding combined total of %d",
-			upRes.matches, wantCounts[allPattern.id])
 	}
 }
 
