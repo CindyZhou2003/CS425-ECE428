@@ -55,7 +55,7 @@ func runClient(args []string) {
 	// Counts only by default: a broad pattern matches six figures of lines, and
 	// rendering those to a terminal takes far longer than the query itself.
 	// --summary is kept as a no-op since it names what now happens anyway.
-	showLines := false
+	showLines := true
 	var grepArgs []string
 	for _, a := range args {
 		switch a {
