@@ -5,9 +5,11 @@ import (
 	"os"
 )
 
+const usage = "usage: mp1 <server|client|genlog|bench> [args...]"
+
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: mp1 <server|client|genlog|testrunner> [args...]")
+		fmt.Fprintln(os.Stderr, usage)
 		os.Exit(1)
 	}
 
@@ -18,8 +20,10 @@ func main() {
 		runClient(os.Args[2:])
 	case "genlog":
 		runGenlog(os.Args[2:])
+	case "bench":
+		runBench(os.Args[2:])
 	default:
-		fmt.Fprintf(os.Stderr, "unknown subcommand %q\nusage: mp1 <server|client|genlog|testrunner> [args...]\n", os.Args[1])
+		fmt.Fprintf(os.Stderr, "unknown subcommand %q\n%s\n", os.Args[1], usage)
 		os.Exit(1)
 	}
 }

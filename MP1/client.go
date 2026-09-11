@@ -14,21 +14,14 @@ import (
 	"time"
 )
 
-// hostsFile lets the VM list change without recompiling; the localhost ports
-// below are the fallback for testing several servers on one machine.
+// hostsFile lets the VM list change without recompiling.
 const hostsFile = "host.txt"
 
-var defaultServers = []string{
-	"127.0.0.1:8001",
-	"127.0.0.1:8002",
-	"127.0.0.1:8003",
-}
-
 // loadServers reads one host:port per line, skipping blanks and # comments.
-func loadServers() []string {
+func loadServers() ([]string, error) {
 	data, err := os.ReadFile(hostsFile)
 	if err != nil {
-		return defaultServers
+		return nil, err
 	}
 	var servers []string
 	for _, line := range strings.Split(string(data), "\n") {
@@ -38,9 +31,9 @@ func loadServers() []string {
 		}
 	}
 	if len(servers) == 0 {
-		return defaultServers
+		return nil, fmt.Errorf("%s lists no hosts", hostsFile)
 	}
-	return servers
+	return servers, nil
 }
 
 type nodeResult struct {
@@ -55,7 +48,7 @@ func runClient(args []string) {
 	// Counts only by default: a broad pattern matches six figures of lines, and
 	// rendering those to a terminal takes far longer than the query itself.
 	// --summary is kept as a no-op since it names what now happens anyway.
-	showLines := true
+	showLines := false
 	var grepArgs []string
 	for _, a := range args {
 		switch a {
@@ -87,21 +80,14 @@ func runClient(args []string) {
 		}
 	}
 
-	serverList := loadServers()
+	serverList, err := loadServers()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: reading VM list: %v\n", err)
+		os.Exit(1)
+	}
 	fmt.Printf("--- Querying grep %q across %d nodes ---\n\n", args, len(serverList))
 
-	// Each goroutine owns one slot, so the report follows host.txt order rather
-	// than whichever node answered first.
-	results := make([]nodeResult, len(serverList))
-	var wg sync.WaitGroup
-	for i, addr := range serverList {
-		wg.Add(1)
-		go func(slot int, target string) {
-			defer wg.Done()
-			results[slot] = queryNode(target, args)
-		}(i, addr)
-	}
-	wg.Wait()
+	results := queryAll(serverList, args)
 
 	// Printing only after every node has answered: concurrent writes to stdout
 	// get split apart once a response outgrows the pipe buffer, which shuffles
@@ -127,7 +113,7 @@ func runClient(args []string) {
 	}
 
 	total := 0
-	fmt.Printf("\n--- Matches per node ---\n")
+	fmt.Printf("\n--- Matches %q per node ---\n", args)
 	for _, r := range results {
 		if r.err != nil {
 			fmt.Printf("%-38s %-16s %10s\n", r.addr, "-", "UNREACHABLE")
@@ -137,6 +123,23 @@ func runClient(args []string) {
 		fmt.Printf("%-38s %-16s %10d\n", r.addr, filepath.Base(r.logFile), r.matches)
 	}
 	fmt.Printf("%-38s %-16s %10d\n", "TOTAL", "", total)
+}
+
+// queryAll sends the grep to every server concurrently. Each goroutine owns one
+// slot, so results follow the server list order rather than whichever node
+// answered first.
+func queryAll(servers []string, grepArgs []string) []nodeResult {
+	results := make([]nodeResult, len(servers))
+	var wg sync.WaitGroup
+	for i, addr := range servers {
+		wg.Add(1)
+		go func(slot int, target string) {
+			defer wg.Done()
+			results[slot] = queryNode(target, grepArgs)
+		}(i, addr)
+	}
+	wg.Wait()
+	return results
 }
 
 func queryNode(target string, grepArgs []string) nodeResult {

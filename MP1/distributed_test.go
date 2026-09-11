@@ -2,257 +2,346 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
 
-// getClusterAddresses resolves server endpoints dynamically.
-// It supports two evaluation modes:
-// 1. Local Simulation Mode (Default): When MP1_VM_ADDRS is unset, it starts N local
-//    goroutines on distinct ports (18001..1800N) to simulate the VMs locally.
-// 2. Real Cluster Mode: When MP1_VM_ADDRS is provided (comma-separated list of host:port),
-//    it targets the actual provisioned CS cluster VMs directly.
-func getClusterAddresses(t *testing.T, count int, tmpDir string, prefix string) []string {
-	envAddrs := os.Getenv("MP1_VM_ADDRS")
-	if envAddrs != "" {
-		addrs := strings.Split(envAddrs, ",")
-		t.Logf("Running in REAL CLUSTER mode with %d VMs: %v", len(addrs), addrs)
-		return addrs
-	}
+const (
+	remoteBinary  = "mp1-linux"
+	remoteLogFile = "machine.%d.log"
+)
 
-	// Default: local multi-port simulation mode
-	basePort := 18000
-	addrs := make([]string, 0, count)
-	for i := 1; i <= count; i++ {
-		logFile := filepath.Join(tmpDir, fmt.Sprintf("%s%d.log", prefix, i))
-		addr := fmt.Sprintf("127.0.0.1:%d", basePort+i)
-		go runServer([]string{fmt.Sprintf("%d", basePort+i), logFile})
-		addrs = append(addrs, addr)
-	}
+// clusterSizes are the rounds TestDistributedGrep runs: every round regenerates
+// the logs for exactly that many VMs and repeats the full query matrix.
+var clusterSizes = []int{6, 7, 8, 9, 10}
 
-	for _, addr := range addrs {
-		if !waitForServer(addr, 3*time.Second) {
-			t.Fatalf("Local simulated server at %s never became reachable", addr)
+// getClusterAddresses returns the VM endpoints, from MP1_VM_ADDRS when set
+// (comma-separated host:port) and otherwise from host.txt, the same list the
+// client and deploy.sh use.
+func getClusterAddresses(t *testing.T) []string {
+	var addrs []string
+	if env := os.Getenv("MP1_VM_ADDRS"); env != "" {
+		for _, a := range strings.Split(env, ",") {
+			if a = strings.TrimSpace(a); a != "" {
+				addrs = append(addrs, a)
+			}
 		}
+	} else {
+		var err error
+		if addrs, err = loadServers(); err != nil {
+			t.Fatalf("reading VM list: %v", err)
+		}
+	}
+
+	need := clusterSizes[len(clusterSizes)-1]
+	if len(addrs) < need {
+		t.Fatalf("need at least %d VM addresses (host.txt or MP1_VM_ADDRS), got %d: %v", need, len(addrs), addrs)
 	}
 	return addrs
 }
 
-// TestDistributedGrep satisfies the required MP1 specification for distributed unit tests.
-// It generates deterministic log files with known planted lines across N (>5) machines,
-// runs the distributed grep query path over TCP, and verifies that the aggregated count
-// matches the exact ground truth without manual intervention.
-//
-// It evaluates all 9 required combinations:
-// - Frequency: rare, somewhat-frequent, frequent
-// - Distribution: occurring in one, some, or all machine log files.
-func TestDistributedGrep(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	cfg := config{
-		numFiles:   6,    // N > 5 as required by the specification
-		minLines:   1,
-		maxLines:   5000,
-		exactLines: 5000, // Fixed line count guarantees deterministic ground truth
-		outDir:     tmpDir,
-		prefix:     "machine.",
-		seed:       42,   // Fixed seed ensures repeatable tests
-		rareRate:   0.0002,
-		midRate:    0.01,
-		freqRate:   0.08,
+// requireNetID gates the test: it ssh-es into the VMs to generate logs and to
+// stop servers, so it cannot run without the campus login deploy.sh uses.
+func requireNetID(t *testing.T) string {
+	netid := os.Getenv("NETID")
+	if netid == "" {
+		t.Skip("NETID not set; run `NETID=<netid> ./deploy.sh all` then `NETID=<netid> go test -v -timeout 60m`")
 	}
-
-	patterns, wantCounts, err := createLogs(cfg)
-	if err != nil {
-		t.Fatalf("createLogs failed: %v", err)
-	}
-
-	addrs := getClusterAddresses(t, cfg.numFiles, tmpDir, cfg.prefix)
-
-	for _, p := range patterns {
-		p := p // Pin range variable for subtest closure
-		t.Run(p.id, func(t *testing.T) {
-			total := 0
-			for i, addr := range addrs {
-				expectedFileName := fmt.Sprintf("%s%d.log", cfg.prefix, i+1)
-
-				// Query the node using literal pattern matching (-F)
-				res := queryNode(addr, []string{"-F", p.phrase})
-				if res.err != nil {
-					t.Fatalf("query to node %s failed: %v", addr, res.err)
-				}
-
-				// The spec requires matching file names and line counts to be verified.
-				// If your node response struct exposes fileName, uncomment this check:
-				
-				if !strings.Contains(res.fileName, expectedFileName) {
-					t.Errorf("Node %s: expected file name %q, got %q", addr, expectedFileName, res.fileName)
-				}
-				
-
-				total += res.matches
-			}
-
-			if total != wantCounts[p.id] {
-				t.Errorf("pattern %q (scope=%s): expected %d total matches across all machines, got %d",
-					p.phrase, p.scope, wantCounts[p.id], total)
-			}
-		})
-	}
+	return netid
 }
 
-// TestGrepOptions_RegexpFlags validates grep feature passthrough as mandated
-// by the specification, specifically regular expression handling via -E,
-// case-insensitivity (-i), and inverted matching (-v).
-func TestGrepOptions_RegexpFlags(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	// Construct deterministic log content for regex evaluation
-	logPath := filepath.Join(tmpDir, "machine.1.log")
-	content := []byte(
-		"2026-09-10 INFO  User login success: UID=1001\n" +
-			"2026-09-10 ERROR Failed connection to DB: timeout after 30s\n" +
-			"2026-09-10 WARN  Disk space low: 95% full\n" +
-			"2026-09-10 info  user logout: UID=1001\n" +
-			"2026-09-10 FATAL System out of memory\n",
-	)
-	if err := os.WriteFile(logPath, content, 0644); err != nil {
-		t.Fatalf("failed to write test log: %v", err)
+func runSSH(netid, addr, command string) (string, error) {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return "", err
 	}
-
-	addr := "127.0.0.1:18099"
-	go runServer([]string{"18099", logPath})
-	if !waitForServer(addr, 2*time.Second) {
-		t.Fatalf("server failed to start at %s", addr)
+	out, err := exec.Command("ssh", "-o", "ConnectTimeout=10", "-o", "BatchMode=yes",
+		netid+"@"+host, command).CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("ssh %s: %v: %s", host, err, strings.TrimSpace(string(out)))
 	}
-
-	testCases := []struct {
-		name        string
-		args        []string
-		wantMatches int
-	}{
-		{
-			name:        "Regex OR condition with -E",
-			args:        []string{"-E", "(ERROR|FATAL)"},
-			wantMatches: 2,
-		},
-		{
-			name:        "Regex digit pattern with -E",
-			args:        []string{"-E", "UID=[0-9]{4}"},
-			wantMatches: 2,
-		},
-		{
-			name:        "Case-insensitive matching with -i",
-			args:        []string{"-i", "info"},
-			wantMatches: 2, // Matches both "INFO" and "info"
-		},
-		{
-			name:        "Invert match with -v",
-			args:        []string{"-v", "2026-09-10"},
-			wantMatches: 0, // All lines have the timestamp header
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			res := queryNode(addr, tc.args)
-			if res.err != nil {
-				t.Fatalf("query with args %v failed: %v", tc.args, res.err)
-			}
-			if res.matches != tc.wantMatches {
-				t.Errorf("args %v: expected %d matches, got %d", tc.args, tc.wantMatches, res.matches)
-			}
-		})
-	}
+	return strings.TrimSpace(string(out)), nil
 }
 
-// TestQueryToleratesDownServer validates the fault-tolerance requirement:
-// If one or more machines fail or become unreachable, the querying machine must
-// not crash and must continue collecting valid responses from all reachable machines.
-func TestQueryToleratesDownServer(t *testing.T) {
-	tmpDir := t.TempDir()
+// generateRemoteLogs has each of the given VMs generate its own log for a
+// cluster of len(addrs) machines, in parallel, and returns each file's size as
+// reported by the VM. Nothing but the command crosses the network.
+func generateRemoteLogs(t *testing.T, netid string, addrs []string, cfg config) []int64 {
+	t.Helper()
+	sizes := make([]int64, len(addrs))
+	errs := make([]error, len(addrs))
 
-	cfg := config{
-		numFiles:   2,
-		minLines:   1,
-		maxLines:   500,
-		exactLines: 500,
-		outDir:     tmpDir,
-		prefix:     "machine.",
-		seed:       7,
-		rareRate:   0.0002,
-		midRate:    0.01,
-		freqRate:   0.08,
+	var wg sync.WaitGroup
+	for i, addr := range addrs {
+		wg.Add(1)
+		go func(i int, addr string) {
+			defer wg.Done()
+			idx := i + 1
+			out, err := runSSH(netid, addr, fmt.Sprintf(
+				"~/%s genlog -n %d -only %d -seed %d -mb %d -rare-rate %g -mid-rate %g -freq-rate %g >/dev/null && wc -c < ~/%s",
+				remoteBinary, cfg.numFiles, idx, cfg.seed, cfg.targetBytes>>20,
+				cfg.rareRate, cfg.midRate, cfg.freqRate, fmt.Sprintf(remoteLogFile, idx)))
+			if err != nil {
+				errs[i] = err
+				return
+			}
+			sizes[i], errs[i] = strconv.ParseInt(out, 10, 64)
+		}(i, addr)
 	}
-	patterns, wantCounts, err := createLogs(cfg)
-	if err != nil {
-		t.Fatalf("createLogs failed: %v", err)
-	}
+	wg.Wait()
 
-	upAddr := "127.0.0.1:18100"
-	downAddr := "127.0.0.1:18101" // Intentionally not started to simulate fail-stop failure
-
-	go runServer([]string{"18100", filepath.Join(tmpDir, "machine.1.log")})
-	if !waitForServer(upAddr, 2*time.Second) {
-		t.Fatalf("server at %s never became reachable", upAddr)
-	}
-
-	// Locate the frequent pattern that occurs across all machines
-	var allPattern *pattern
-	for i := range patterns {
-		if patterns[i].id == "FREQ_ALL" {
-			allPattern = &patterns[i]
-			break
+	for i, err := range errs {
+		if err != nil {
+			t.Fatalf("generating log on VM %d (%s): %v", i+1, addrs[i], err)
 		}
 	}
-	if allPattern == nil {
-		t.Fatal("test setup error: FREQ_ALL pattern not found")
-	}
-	clusterAddrs := []string{upAddr, downAddr}
-	totalMatches := 0
-	failedCount := 0
+	return sizes
+}
 
-	for _, addr := range clusterAddrs {
-		res := queryNode(addr, []string{"-F", allPattern.phrase})
-		if res.err != nil {
-			// A down server must be captured as an error and must not cause a fatal crash
-			failedCount++
-			t.Logf("Expected failure observed for down server %s: %v", addr, res.err)
+// stopServer kills the grep server on one VM, the way a fail-stop crash would.
+func stopServer(netid, addr string) error {
+	_, err := runSSH(netid, addr, fmt.Sprintf(
+		"pkill -x %[1]s; while pgrep -x %[1]s >/dev/null; do sleep 0.1; done", remoteBinary))
+	return err
+}
+
+// startServer brings a VM's server back exactly as deploy.sh starts it.
+// </dev/null and the redirects let ssh return instead of waiting on it.
+func startServer(netid, addr string, idx int) error {
+	_, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return err
+	}
+	if _, err := runSSH(netid, addr, fmt.Sprintf(
+		"nohup ~/%s server %s ~/%s > ~/server.log 2>&1 </dev/null &",
+		remoteBinary, port, fmt.Sprintf(remoteLogFile, idx))); err != nil {
+		return err
+	}
+	if !waitForServer(addr, 10*time.Second) {
+		return fmt.Errorf("server on %s did not come back", addr)
+	}
+	return nil
+}
+
+// optionCases exercise -E and -i at every frequency and scope. ids lists the
+// planted patterns each query should match; random lines never do.
+var optionCases = []struct {
+	name string
+	args []string
+	ids  []string
+}{
+	{"OPT_RARE_ONE_fixed_prefix", []string{"-F", "unrecoverable disk corruption"}, []string{"RARE_ONE"}},
+	{"OPT_RARE_SOME_-E_group", []string{"-E", "gossip message dropped due to (malformed|corrupt) header"}, []string{"RARE_SOME"}},
+	{"OPT_RARE_ALL_-i", []string{"-i", "SWAP SPACE USAGE exceeded 90% threshold"}, []string{"RARE_ALL"}},
+	{"OPT_MID_ONE_-E_digits", []string{"-E", "RPC call to peer timed out after [0-9]+ retries"}, []string{"MID_ONE"}},
+	{"OPT_MID_SOME_-i", []string{"-i", "Membership List Out Of Sync"}, []string{"MID_SOME"}},
+	{"OPT_MID_ALL_SOME_-E_alternation", []string{"-E", "leader election triggered|membership list out of sync"}, []string{"MID_ALL", "MID_SOME"}},
+	{"OPT_FREQ_ONE_-E_digits", []string{"-E", "slow disk write detected, latency above [0-9]+ms"}, []string{"FREQ_ONE"}},
+	{"OPT_FREQ_SOME_-i", []string{"-i", "GARBAGE COLLECTION PAUSE"}, []string{"FREQ_SOME"}},
+	{"OPT_FREQ_ALL_-E_group", []string{"-E", "heartbeat acknowledged by (peer|leader)"}, []string{"FREQ_ALL"}},
+	{"OPT_FREQ_ALL_-i_-E", []string{"-i", "-E", "HEARTBEAT ACK[a-z]+ BY PEER"}, []string{"FREQ_ALL"}},
+}
+
+// randomLineRegex matches every generated line that is not a planted pattern:
+// those all end in "]: <verb> <noun>". Inverting it therefore selects exactly
+// the planted lines, which gives -v a known answer without shipping ~60 MB of
+// non-matching lines back per node.
+func randomLineRegex() string {
+	quote := func(words []string) string {
+		out := make([]string, len(words))
+		for i, w := range words {
+			out[i] = strings.ReplaceAll(w, ".", `\.`)
+		}
+		return strings.Join(out, "|")
+	}
+	return "]: (" + quote(verbs) + ") (" + quote(nouns) + ")$"
+}
+
+// TestDistributedGrep is the MP1 distributed unit test. For each cluster size
+// in clusterSizes it:
+//  1. has every VM generate its own ~60 MB log: random lines plus planted
+//     known lines at three frequencies (rare / somewhat frequent / frequent)
+//     scoped to one / some / all of the machines;
+//  2. derives the exact ground truth by replaying the same seeded generator
+//     into io.Discard;
+//  3. runs a grep for every pattern, plus grep options (-E, -i, -v), through
+//     the querying program and checks each node's file name and match count
+//     and the cluster-wide total;
+//  4. kills one VM's server and checks the others are still collected exactly.
+//
+// Each round uses its own seed, so the "some" subset and every file's content
+// differ between rounds.
+func TestDistributedGrep(t *testing.T) {
+	netid := requireNetID(t)
+	allAddrs := getClusterAddresses(t)
+
+	for _, k := range clusterSizes {
+		t.Run(fmt.Sprintf("VMs=%d", k), func(t *testing.T) {
+			addrs := allAddrs[:k]
+			cfg := config{
+				numFiles:    k,
+				targetBytes: defaultSizeMB << 20,
+				seed:        int64(defaultSeed + k),
+				rareRate:    defaultRareRate,
+				midRate:     defaultMidRate,
+				freqRate:    defaultFreqRate,
+			}
+			if err := cfg.validate(); err != nil {
+				t.Fatal(err)
+			}
+
+			patterns := buildPatterns(cfg)
+			want := make([]fileStats, k) // want[i] describes VM i+1's log
+			for i := range want {
+				st, err := generateLog(io.Discard, cfg, patterns, i+1)
+				if err != nil {
+					t.Fatalf("computing ground truth for VM %d: %v", i+1, err)
+				}
+				want[i] = st
+			}
+
+			start := time.Now()
+			sizes := generateRemoteLogs(t, netid, addrs, cfg)
+			t.Logf("generated %d logs on the VMs in %v (seed %d)", k, time.Since(start).Round(time.Millisecond), cfg.seed)
+
+			// A size mismatch means the VM's file is not the one the ground truth
+			// describes (stale binary, wrong seed), so every count check would
+			// be meaningless.
+			for i, size := range sizes {
+				if size < cfg.targetBytes {
+					t.Errorf("VM %d: log is %d bytes, want at least %d MiB", i+1, size, defaultSizeMB)
+				}
+				if size != want[i].bytes {
+					t.Fatalf("VM %d: log is %d bytes but ground truth expects %d; redeploy with ./deploy.sh build push",
+						i+1, size, want[i].bytes)
+				}
+			}
+
+			// expect returns, per VM, how many lines hold any of the given patterns.
+			// Each line holds at most one pattern, so the counts simply add up.
+			expect := func(ids ...string) []int {
+				out := make([]int, k)
+				for i := range out {
+					for _, id := range ids {
+						out[i] += want[i].counts[id]
+					}
+				}
+				return out
+			}
+			byID := make(map[string]pattern, len(patterns))
+			allIDs := make([]string, 0, len(patterns))
+			for _, p := range patterns {
+				byID[p.id] = p
+				allIDs = append(allIDs, p.id)
+			}
+
+			for _, p := range patterns {
+				t.Run(p.id, func(t *testing.T) {
+					checkQuery(t, addrs, nil, []string{"-F", p.phrase}, expect(p.id))
+				})
+			}
+
+			// Grep options must pass through untouched: -E and -i queries across
+			// all three frequencies, each written to hit known planted patterns.
+			for _, tc := range optionCases {
+				t.Run(tc.name, func(t *testing.T) {
+					checkQuery(t, addrs, nil, tc.args, expect(tc.ids...))
+				})
+			}
+			t.Run("REGEX_ALTERNATION_ALL_TIERS", func(t *testing.T) {
+				args := []string{"-E", byID["RARE_ONE"].phrase + "|" + byID["MID_SOME"].phrase + "|" + byID["FREQ_ALL"].phrase}
+				checkQuery(t, addrs, nil, args, expect("RARE_ONE", "MID_SOME", "FREQ_ALL"))
+			})
+			t.Run("INVERT_MATCH", func(t *testing.T) {
+				checkQuery(t, addrs, nil, []string{"-v", "-E", randomLineRegex()}, expect(allIDs...))
+			})
+			t.Run("ABSENT_PATTERN", func(t *testing.T) {
+				checkQuery(t, addrs, nil, []string{"-F", "this phrase is never planted in any log"}, make([]int, k))
+			})
+
+			// Rotates through VMs 2..6 across rounds; VM 1 holds every ONE pattern.
+			t.Run("FAIL_STOP", func(t *testing.T) {
+				victim := k - 4
+				addr := addrs[victim-1]
+				if err := stopServer(netid, addr); err != nil {
+					t.Fatalf("stopping VM %d: %v", victim, err)
+				}
+				t.Cleanup(func() {
+					if err := startServer(netid, addr, victim); err != nil {
+						t.Errorf("restarting VM %d: %v; later rounds will fail until ./deploy.sh start", victim, err)
+					}
+				})
+
+				down := map[int]bool{victim: true}
+				checkQuery(t, addrs, down, []string{"-F", byID["FREQ_ALL"].phrase}, expect("FREQ_ALL"))
+				checkQuery(t, addrs, down, []string{"-F", byID["RARE_SOME"].phrase}, expect("RARE_SOME"))
+			})
+		})
+	}
+}
+
+// checkQuery runs one grep across the cluster and verifies that every node
+// answered from its own log file with exactly the expected number of matches,
+// and that the aggregate is right. VMs in down must report an error instead,
+// and are left out of the expected total.
+func checkQuery(t *testing.T, addrs []string, down map[int]bool, grepArgs []string, expected []int) {
+	t.Helper()
+	start := time.Now()
+	results := queryAll(addrs, grepArgs)
+	elapsed := time.Since(start)
+
+	got, wantTotal := 0, 0
+	for i, res := range results {
+		idx := i + 1
+		if down[idx] {
+			if res.err == nil {
+				t.Errorf("VM %d (%s) is down but answered with %d matches", idx, res.addr, res.matches)
+			}
 			continue
 		}
-		totalMatches += res.matches
+		wantTotal += expected[i]
+		if res.err != nil {
+			t.Errorf("VM %d (%s): query failed: %v", idx, res.addr, res.err)
+			continue
+		}
+		if wantFile := fmt.Sprintf(remoteLogFile, idx); filepath.Base(res.logFile) != wantFile {
+			t.Errorf("VM %d (%s): answered from %q, want %q", idx, res.addr, res.logFile, wantFile)
+		}
+		if res.matches != expected[i] {
+			t.Errorf("VM %d (%s): %d matches, want %d", idx, res.addr, res.matches, expected[i])
+		}
+		// The count comes from the server's header; the lines are what the user
+		// actually sees, so both must agree.
+		if lines := strings.Count(res.lines, "\n"); lines != res.matches {
+			t.Errorf("VM %d (%s): header says %d matches but %d lines were returned", idx, res.addr, res.matches, lines)
+		}
+		got += res.matches
 	}
-
-	// 1. Verify that exactly one failed node is detected
-	if failedCount != 1 {
-		t.Errorf("expected exactly 1 failed node, got %d", failedCount)
+	if got != wantTotal {
+		t.Errorf("grep %q: %d total matches across %d VMs, want %d", grepArgs, got, len(addrs)-len(down), wantTotal)
 	}
-
-	// 2. Verify that matching counts from surviving nodes are aggregated properly (must be positive and within bounds)
-	if totalMatches <= 0 {
-		t.Errorf("expected survivor node to yield matches, got %d", totalMatches)
-	}
-	if totalMatches > wantCounts[allPattern.id] {
-		t.Errorf("survivor matches %d exceeded expected upper bound %d",
-			totalMatches, wantCounts[allPattern.id])
-	}
+	t.Logf("%d matches across %d VMs in %v", got, len(addrs)-len(down), elapsed.Round(time.Millisecond))
 }
 
 // waitForServer polls an address until a TCP connection is established
-// or the designated timeout period expires.
+// or the timeout expires.
 func waitForServer(addr string, timeout time.Duration) bool {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
-		conn, err := net.DialTimeout("tcp", addr, 100*time.Millisecond)
+		conn, err := net.DialTimeout("tcp", addr, 500*time.Millisecond)
 		if err == nil {
 			conn.Close()
 			return true
 		}
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 	}
 	return false
 }

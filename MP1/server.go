@@ -5,18 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 	"os/exec"
 	"strings"
 )
 
 func runServer(args []string) {
-	port := "8001"
-	logFile := "machine.1.log"
-
-	if len(args) >= 2 {
-		port = args[0]
-		logFile = args[1]
+	if len(args) != 2 {
+		fmt.Fprintln(os.Stderr, "usage: mp1 server <port> <log file>")
+		os.Exit(1)
 	}
+	port, logFile := args[0], args[1]
 
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {

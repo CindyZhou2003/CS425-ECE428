@@ -16,6 +16,8 @@ NETID="${NETID:-$USER}"
 HOSTS_FILE="host.txt"
 BINARY="mp1-linux"
 SSH_OPTS="-o ConnectTimeout=10 -o BatchMode=yes"
+SEED="${SEED:-42}"
+MB="${MB:-60}"
 
 usage() {
 	cat <<'USAGE'
@@ -23,16 +25,23 @@ Usage: [NETID=your_netid] ./deploy.sh <command>
 
 Commands:
   build     cross-compile mp1-linux for the VMs (linux/amd64)
-  push      copy the binary, host.txt, and each node's own log file
+  push      copy the binary and host.txt to every node
+  genlog    have each node generate its own log file in place
   start     (re)start the server on every node
   stop      stop the server on every node
   status    report which nodes have a server running
-  all       build + push + start + status
+  all       build + push + genlog + start + status
 
 Environment:
   NETID     campus login used for ssh/scp (default: $USER)
+  SEED      log generation seed, shared by every node (default: 42)
+  MB        size of each node's log file in MiB (default: 60)
 
-Node list is read from host.txt: line N is VM N and receives logs/machine.N.log.
+Node list is read from host.txt: line N is VM N and generates machine.N.log.
+Each node runs genlog itself rather than receiving a copy, so deploying moves
+a 5 MB binary instead of MB x N of logs. Generation is seeded per file, so a
+node's log depends only on SEED, MB, the cluster size, and its own index.
+
 Set up passwordless ssh first, otherwise every step prompts for a password:
   ssh-keygen -t ed25519
   ssh-copy-id your_netid@<each host>
@@ -71,24 +80,41 @@ cmd_push() {
 		exit 1
 	fi
 
-	local n=0
 	for node in "${NODES[@]}"; do
-		n=$((n + 1))
-		if [ ! -f "logs/machine.$n.log" ]; then
-			echo "error: logs/machine.$n.log missing, run: go run . genlog -n ${#NODES[@]}" >&2
-			exit 1
-		fi
-	done
-
-	n=0
-	for node in "${NODES[@]}"; do
-		n=$((n + 1))
 		host="${node%:*}"
-		echo "==> push  $host  (machine.$n.log)"
-		scp $SSH_OPTS -q "$BINARY" "$HOSTS_FILE" "logs/machine.$n.log" "$NETID@$host:~/" &&
+		echo "==> push  $host"
+		scp $SSH_OPTS -q "$BINARY" "$HOSTS_FILE" "$NETID@$host:~/" &&
 			ssh $SSH_OPTS "$NETID@$host" "chmod +x ~/$BINARY" ||
 			echo "    FAILED"
 	done
+}
+
+# cmd_genlog asks every node to generate its own log file. The -only flag picks
+# that node's index out of the cluster-wide plan, so which patterns land in the
+# file (and how often) still matches the plan the test verifies against.
+cmd_genlog() {
+	read_nodes
+	local total="${#NODES[@]}"
+	echo "==> generating machine.N.log on $total nodes (seed $SEED, ${MB} MiB each)"
+
+	local n=0
+	for node in "${NODES[@]}"; do
+		n=$((n + 1))
+		host="${node%:*}"
+		# Backgrounded: each node generates independently, so the wall time is
+		# one file's worth rather than the sum over the cluster.
+		(
+			out=$(ssh $SSH_OPTS "$NETID@$host" \
+				"~/$BINARY genlog -n $total -only $n -seed $SEED -mb $MB -outdir ~ -prefix machine. >/dev/null &&
+				 wc -c < ~/machine.$n.log" 2>&1)
+			if [ $? -ne 0 ]; then
+				printf '    %-40s FAILED: %s\n' "$host" "$out"
+			else
+				printf '    %-40s machine.%s.log  %s bytes\n' "$host" "$n" "$out"
+			fi
+		) &
+	done
+	wait
 }
 
 cmd_start() {
@@ -158,6 +184,10 @@ push)
 	echo "NETID=$NETID"
 	cmd_push
 	;;
+genlog)
+	echo "NETID=$NETID"
+	cmd_genlog
+	;;
 start)
 	echo "NETID=$NETID"
 	cmd_start
@@ -174,6 +204,7 @@ all)
 	echo "NETID=$NETID"
 	cmd_build
 	cmd_push
+	cmd_genlog
 	cmd_start
 	echo
 	cmd_status
