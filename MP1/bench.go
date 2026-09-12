@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -35,7 +33,6 @@ func runBench(args []string) {
 	trials := fs.Int("trials", 5, "measured queries per pattern and cluster size")
 	warmup := fs.Int("warmup", 1, "unmeasured queries run first, so every log is already in the page cache")
 	vmsFlag := fs.String("vms", "", "comma-separated cluster sizes, each using the first K hosts in host.txt (default: all hosts)")
-	csvPath := fs.String("csv", "", "also write every measurement to this CSV file, for plotting")
 	fs.Parse(args)
 
 	servers, err := loadServers()
@@ -58,7 +55,6 @@ func runBench(args []string) {
 		}
 	}
 
-	var rows [][]string
 	fmt.Printf("%d measured trials per row, %d warm-up\n\n", *trials, *warmup)
 	fmt.Printf("%-4s %-11s %10s %10s %10s %10s %10s\n", "VMs", "pattern", "matches", "mean", "stddev", "min", "max")
 
@@ -79,22 +75,11 @@ func runBench(args []string) {
 				}
 				latencies[i] = float64(d.Microseconds()) / 1000
 				matches = m
-				rows = append(rows, []string{
-					strconv.Itoa(k), p.label, strconv.Itoa(i + 1),
-					strconv.FormatFloat(latencies[i], 'f', 3, 64), strconv.Itoa(m),
-				})
 			}
 
 			mean, sd, lo, hi := summarize(latencies)
 			fmt.Printf("%-4d %-11s %10d %8.1fms %8.1fms %8.1fms %8.1fms\n", k, p.label, matches, mean, sd, lo, hi)
 		}
-	}
-
-	if *csvPath != "" {
-		if err := writeCSV(*csvPath, rows); err != nil {
-			fatalf("writing %s: %v", *csvPath, err)
-		}
-		fmt.Printf("\nwrote %d measurements to %s\n", len(rows), *csvPath)
 	}
 }
 
@@ -130,19 +115,4 @@ func summarize(xs []float64) (mean, sd, lo, hi float64) {
 	}
 	sd = math.Sqrt(sd / float64(len(xs)-1))
 	return mean, sd, lo, hi
-}
-
-func writeCSV(path string, rows [][]string) error {
-	f, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	w := csv.NewWriter(f)
-	w.Write([]string{"vms", "pattern", "trial", "latency_ms", "matches"})
-	w.WriteAll(rows)
-	if err := w.Error(); err != nil {
-		f.Close()
-		return err
-	}
-	return f.Close()
 }

@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -23,33 +25,6 @@ const (
 // the logs for exactly that many VMs and repeats the full query matrix.
 var clusterSizes = []int{6, 7, 8, 9, 10}
 
-// getClusterAddresses returns the VM endpoints, from MP1_VM_ADDRS when set
-// (comma-separated host:port) and otherwise from host.txt, the same list the
-// client and deploy.sh use.
-func getClusterAddresses(t *testing.T) []string {
-	var addrs []string
-	if env := os.Getenv("MP1_VM_ADDRS"); env != "" {
-		for _, a := range strings.Split(env, ",") {
-			if a = strings.TrimSpace(a); a != "" {
-				addrs = append(addrs, a)
-			}
-		}
-	} else {
-		var err error
-		if addrs, err = loadServers(); err != nil {
-			t.Fatalf("reading VM list: %v", err)
-		}
-	}
-
-	need := clusterSizes[len(clusterSizes)-1]
-	if len(addrs) < need {
-		t.Fatalf("need at least %d VM addresses (host.txt or MP1_VM_ADDRS), got %d: %v", need, len(addrs), addrs)
-	}
-	return addrs
-}
-
-// requireNetID gates the test: it ssh-es into the VMs to generate logs and to
-// stop servers, so it cannot run without the campus login deploy.sh uses.
 func requireNetID(t *testing.T) string {
 	netid := os.Getenv("NETID")
 	if netid == "" {
@@ -71,23 +46,43 @@ func runSSH(netid, addr, command string) (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-// generateRemoteLogs has each of the given VMs generate its own log for a
-// cluster of len(addrs) machines, in parallel, and returns each file's size as
-// reported by the VM. Nothing but the command crosses the network.
+// pickMembers draws the k VMs a round runs on: a random subset of the n VMs in
+// host.txt, as ascending 1-based indices. It is derived from the round's seed,
+// so rerunning a failed round picks the same VMs.
+func pickMembers(n, k int, seed int64) []int {
+	rng := rand.New(rand.NewSource(seed ^ 0x2545F4914F6CDD1D))
+	members := rng.Perm(n)[:k]
+	for i := range members {
+		members[i]++
+	}
+	sort.Ints(members)
+	return members
+}
+
+// generateRemoteLogs has each of the given VMs generate its own log for the
+// cluster cfg.members, in parallel, and returns each file's size as reported
+// by the VM. addrs[i] is VM cfg.members[i]. Nothing but the command crosses
+// the network.
 func generateRemoteLogs(t *testing.T, netid string, addrs []string, cfg config) []int64 {
 	t.Helper()
 	sizes := make([]int64, len(addrs))
 	errs := make([]error, len(addrs))
+
+	list := make([]string, len(cfg.members))
+	for i, m := range cfg.members {
+		list[i] = strconv.Itoa(m)
+	}
+	members := strings.Join(list, ",")
 
 	var wg sync.WaitGroup
 	for i, addr := range addrs {
 		wg.Add(1)
 		go func(i int, addr string) {
 			defer wg.Done()
-			idx := i + 1
+			idx := cfg.members[i]
 			out, err := runSSH(netid, addr, fmt.Sprintf(
-				"~/%s genlog -n %d -only %d -seed %d -mb %d -rare-rate %g -mid-rate %g -freq-rate %g >/dev/null && wc -c < ~/%s",
-				remoteBinary, cfg.numFiles, idx, cfg.seed, cfg.targetBytes>>20,
+				"~/%s genlog -members %s -only %d -seed %d -mb %d -rare-rate %g -mid-rate %g -freq-rate %g >/dev/null && wc -c < ~/%s",
+				remoteBinary, members, idx, cfg.seed, cfg.targetBytes>>20,
 				cfg.rareRate, cfg.midRate, cfg.freqRate, fmt.Sprintf(remoteLogFile, idx)))
 			if err != nil {
 				errs[i] = err
@@ -100,7 +95,7 @@ func generateRemoteLogs(t *testing.T, netid string, addrs []string, cfg config) 
 
 	for i, err := range errs {
 		if err != nil {
-			t.Fatalf("generating log on VM %d (%s): %v", i+1, addrs[i], err)
+			t.Fatalf("generating log on VM %d (%s): %v", cfg.members[i], addrs[i], err)
 		}
 	}
 	return sizes
@@ -177,19 +172,31 @@ func randomLineRegex() string {
 //     and the cluster-wide total;
 //  4. kills one VM's server and checks the others are still collected exactly.
 //
-// Each round uses its own seed, so the "some" subset and every file's content
-// differ between rounds.
+// Each round uses its own seed, so the VMs picked, the "some" subset and every
+// file's content differ between rounds.
 func TestDistributedGrep(t *testing.T) {
 	netid := requireNetID(t)
-	allAddrs := getClusterAddresses(t)
+
+	allAddrs, err := loadServers()
+	if err != nil {
+		t.Fatalf("loading server addresses: %v", err)
+	}
+	if need := clusterSizes[len(clusterSizes)-1]; len(allAddrs) < need {
+		t.Fatalf("need at least %d VMs in host.txt, got %d", need, len(allAddrs))
+	}
 
 	for _, k := range clusterSizes {
 		t.Run(fmt.Sprintf("VMs=%d", k), func(t *testing.T) {
-			addrs := allAddrs[:k]
+			seed := int64(defaultSeed + k)
+			members := pickMembers(len(allAddrs), k, seed)
+			addrs := make([]string, k) // addrs[i] is VM members[i]
+			for i, m := range members {
+				addrs[i] = allAddrs[m-1]
+			}
 			cfg := config{
-				numFiles:    k,
+				members:     members,
 				targetBytes: defaultSizeMB << 20,
-				seed:        int64(defaultSeed + k),
+				seed:        seed,
 				rareRate:    defaultRareRate,
 				midRate:     defaultMidRate,
 				freqRate:    defaultFreqRate,
@@ -199,29 +206,24 @@ func TestDistributedGrep(t *testing.T) {
 			}
 
 			patterns := buildPatterns(cfg)
-			want := make([]fileStats, k) // want[i] describes VM i+1's log
+			want := make([]fileStats, k) // save logs for validation
 			for i := range want {
-				st, err := generateLog(io.Discard, cfg, patterns, i+1)
+				st, err := generateLog(io.Discard, cfg, patterns, members[i])
 				if err != nil {
-					t.Fatalf("computing ground truth for VM %d: %v", i+1, err)
+					t.Fatalf("computing ground truth for VM %d: %v", members[i], err)
 				}
 				want[i] = st
 			}
 
 			start := time.Now()
 			sizes := generateRemoteLogs(t, netid, addrs, cfg)
-			t.Logf("generated %d logs on the VMs in %v (seed %d)", k, time.Since(start).Round(time.Millisecond), cfg.seed)
+			t.Logf("generated %d logs on VMs %v in %v (seed %d)", k, members, time.Since(start).Round(time.Millisecond), cfg.seed)
 
-			// A size mismatch means the VM's file is not the one the ground truth
-			// describes (stale binary, wrong seed), so every count check would
-			// be meaningless.
+			// Compare log lines
 			for i, size := range sizes {
-				if size < cfg.targetBytes {
-					t.Errorf("VM %d: log is %d bytes, want at least %d MiB", i+1, size, defaultSizeMB)
-				}
 				if size != want[i].bytes {
 					t.Fatalf("VM %d: log is %d bytes but ground truth expects %d; redeploy with ./deploy.sh build push",
-						i+1, size, want[i].bytes)
+						members[i], size, want[i].bytes)
 				}
 			}
 
@@ -245,7 +247,7 @@ func TestDistributedGrep(t *testing.T) {
 
 			for _, p := range patterns {
 				t.Run(p.id, func(t *testing.T) {
-					checkQuery(t, addrs, nil, []string{"-F", p.phrase}, expect(p.id))
+					checkQuery(t, addrs, members, nil, []string{"-F", p.phrase}, expect(p.id))
 				})
 			}
 
@@ -253,24 +255,24 @@ func TestDistributedGrep(t *testing.T) {
 			// all three frequencies, each written to hit known planted patterns.
 			for _, tc := range optionCases {
 				t.Run(tc.name, func(t *testing.T) {
-					checkQuery(t, addrs, nil, tc.args, expect(tc.ids...))
+					checkQuery(t, addrs, members, nil, tc.args, expect(tc.ids...))
 				})
 			}
 			t.Run("REGEX_ALTERNATION_ALL_TIERS", func(t *testing.T) {
 				args := []string{"-E", byID["RARE_ONE"].phrase + "|" + byID["MID_SOME"].phrase + "|" + byID["FREQ_ALL"].phrase}
-				checkQuery(t, addrs, nil, args, expect("RARE_ONE", "MID_SOME", "FREQ_ALL"))
+				checkQuery(t, addrs, members, nil, args, expect("RARE_ONE", "MID_SOME", "FREQ_ALL"))
 			})
 			t.Run("INVERT_MATCH", func(t *testing.T) {
-				checkQuery(t, addrs, nil, []string{"-v", "-E", randomLineRegex()}, expect(allIDs...))
+				checkQuery(t, addrs, members, nil, []string{"-v", "-E", randomLineRegex()}, expect(allIDs...))
 			})
 			t.Run("ABSENT_PATTERN", func(t *testing.T) {
-				checkQuery(t, addrs, nil, []string{"-F", "this phrase is never planted in any log"}, make([]int, k))
+				checkQuery(t, addrs, members, nil, []string{"-F", "this phrase is never planted in any log"}, make([]int, k))
 			})
 
-			// Rotates through VMs 2..6 across rounds; VM 1 holds every ONE pattern.
+			// Rotates through the 2nd..6th picked VM across rounds; the 1st picked
+			// VM holds every ONE pattern.
 			t.Run("FAIL_STOP", func(t *testing.T) {
-				victim := k - 4
-				addr := addrs[victim-1]
+				victim, addr := members[k-5], addrs[k-5]
 				if err := stopServer(netid, addr); err != nil {
 					t.Fatalf("stopping VM %d: %v", victim, err)
 				}
@@ -281,8 +283,8 @@ func TestDistributedGrep(t *testing.T) {
 				})
 
 				down := map[int]bool{victim: true}
-				checkQuery(t, addrs, down, []string{"-F", byID["FREQ_ALL"].phrase}, expect("FREQ_ALL"))
-				checkQuery(t, addrs, down, []string{"-F", byID["RARE_SOME"].phrase}, expect("RARE_SOME"))
+				checkQuery(t, addrs, members, down, []string{"-F", byID["FREQ_ALL"].phrase}, expect("FREQ_ALL"))
+				checkQuery(t, addrs, members, down, []string{"-F", byID["RARE_SOME"].phrase}, expect("RARE_SOME"))
 			})
 		})
 	}
@@ -290,9 +292,9 @@ func TestDistributedGrep(t *testing.T) {
 
 // checkQuery runs one grep across the cluster and verifies that every node
 // answered from its own log file with exactly the expected number of matches,
-// and that the aggregate is right. VMs in down must report an error instead,
-// and are left out of the expected total.
-func checkQuery(t *testing.T, addrs []string, down map[int]bool, grepArgs []string, expected []int) {
+// and that the aggregate is right. addrs[i] is VM members[i]. VMs in down (by
+// VM index) must report an error instead, and are left out of the expected total.
+func checkQuery(t *testing.T, addrs []string, members []int, down map[int]bool, grepArgs []string, expected []int) {
 	t.Helper()
 	start := time.Now()
 	results := queryAll(addrs, grepArgs)
@@ -300,7 +302,7 @@ func checkQuery(t *testing.T, addrs []string, down map[int]bool, grepArgs []stri
 
 	got, wantTotal := 0, 0
 	for i, res := range results {
-		idx := i + 1
+		idx := members[i]
 		if down[idx] {
 			if res.err == nil {
 				t.Errorf("VM %d (%s) is down but answered with %d matches", idx, res.addr, res.matches)

@@ -8,7 +8,9 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -43,7 +45,6 @@ type pattern struct {
 	id     string
 	phrase string
 	rate   float64
-	scope  string // "ONE" / "SOME" / "ALL"
 	files  map[int]bool
 }
 
@@ -81,7 +82,7 @@ const (
 // config is the cluster-wide generation plan. Every VM must use the same one,
 // differing only in which file index it writes.
 type config struct {
-	numFiles    int
+	members     []int // ascending host.txt indices of the cluster's VMs; VM N writes machine.N.log
 	targetBytes int64
 	seed        int64
 	rareRate    float64
@@ -90,8 +91,14 @@ type config struct {
 }
 
 func (cfg config) validate() error {
-	if cfg.numFiles < 1 {
-		return fmt.Errorf("cluster size must be at least 1, got %d", cfg.numFiles)
+	if len(cfg.members) < 1 {
+		return fmt.Errorf("cluster must have at least 1 VM, got %v", cfg.members)
+	}
+	// Ascending and unique, so every VM derives the same ONE and SOME sets.
+	for i, m := range cfg.members {
+		if m < 1 || (i > 0 && m <= cfg.members[i-1]) {
+			return fmt.Errorf("members must be distinct VM indices >= 1, got %v", cfg.members)
+		}
 	}
 	if cfg.targetBytes <= 0 {
 		return fmt.Errorf("target size must be positive, got %d bytes", cfg.targetBytes)
@@ -106,7 +113,6 @@ func (cfg config) validate() error {
 
 // fileStats is the ground truth for one generated log file.
 type fileStats struct {
-	lines  int
 	bytes  int64
 	counts map[string]int // pattern id -> planted occurrences in this file
 }
@@ -122,19 +128,20 @@ func fileRNG(seed int64, fileIdx int) *rand.Rand {
 }
 
 func buildPatterns(cfg config) []pattern {
-	all := make(map[int]bool, cfg.numFiles)
-	one := map[int]bool{1: true}
-	for i := 1; i <= cfg.numFiles; i++ {
-		all[i] = true
+	n := len(cfg.members)
+	all := make(map[int]bool, n)
+	one := map[int]bool{cfg.members[0]: true}
+	for _, m := range cfg.members {
+		all[m] = true
 	}
 
-	// Its own stream, so the SOME set depends only on (seed, numFiles) and every
+	// Its own stream, so the SOME set depends only on (seed, members) and every
 	// VM independently picks the same subset.
 	some := make(map[int]bool)
 	someRNG := rand.New(rand.NewSource(cfg.seed ^ 0x5DEECE66D))
-	numSome := max(cfg.numFiles/2, 1)
-	for _, idx := range someRNG.Perm(cfg.numFiles)[:numSome] {
-		some[idx+1] = true
+	numSome := max(n/2, 1)
+	for _, i := range someRNG.Perm(n)[:numSome] {
+		some[cfg.members[i]] = true
 	}
 
 	tiers := []struct {
@@ -157,7 +164,6 @@ func buildPatterns(cfg config) []pattern {
 				id:     fmt.Sprintf("%s_%s", t.label, s.label),
 				phrase: phrases[t.label][s.label],
 				rate:   t.rate,
-				scope:  s.label,
 				files:  s.files,
 			})
 		}
@@ -169,8 +175,9 @@ func buildPatterns(cfg config) []pattern {
 func runGenlog(args []string) {
 	fs := flag.NewFlagSet("genlog", flag.ExitOnError)
 	var (
-		numFiles = fs.Int("n", 10, "number of VMs in the cluster the logs are planned for")
-		only     = fs.Int("only", 0, "index of this VM's log file, 1..n (required)")
+		numFiles = fs.Int("n", 10, "number of VMs in the cluster the logs are planned for, VMs 1..n")
+		members  = fs.String("members", "", "comma-separated VM indices in the cluster, e.g. 2,5,7 (overrides -n)")
+		only     = fs.Int("only", 0, "index of this VM's log file, one of the cluster's VMs (required)")
 		sizeMB   = fs.Int("mb", defaultSizeMB, "size of the log file in MiB")
 		outDir   = fs.String("outdir", "", "directory to write the log file into (default: home directory)")
 		prefix   = fs.String("prefix", "machine.", "filename prefix; the file is named <prefix>N.log")
@@ -181,15 +188,19 @@ func runGenlog(args []string) {
 	)
 	fs.Parse(args)
 
+	vms, err := parseMembers(*members, *numFiles)
+	if err != nil {
+		fatalf("%v", err)
+	}
 	cfg := config{
-		numFiles: *numFiles, targetBytes: int64(*sizeMB) << 20, seed: *seed,
+		members: vms, targetBytes: int64(*sizeMB) << 20, seed: *seed,
 		rareRate: *rareRate, midRate: *midRate, freqRate: *freqRate,
 	}
 	if err := cfg.validate(); err != nil {
 		fatalf("%v", err)
 	}
-	if *only < 1 || *only > *numFiles {
-		fatalf("-only must name this VM's index in 1..%d, got %d", *numFiles, *only)
+	if !slices.Contains(cfg.members, *only) {
+		fatalf("-only must name this VM's index, one of %v, got %d", cfg.members, *only)
 	}
 	if *outDir == "" {
 		home, err := os.UserHomeDir()
@@ -201,11 +212,30 @@ func runGenlog(args []string) {
 
 	path := filepath.Join(*outDir, fmt.Sprintf("%s%d.log", *prefix, *only))
 	patterns := buildPatterns(cfg)
-	st, err := writeLogFile(path, cfg, patterns, *only)
-	if err != nil {
+	if _, err := writeLogFile(path, cfg, patterns, *only); err != nil {
 		fatalf("writing %s: %v", path, err)
 	}
-	printSummary(path, patterns, st)
+}
+
+// parseMembers turns -members into the cluster's ascending VM indices. Without
+// it the cluster is VMs 1..n, which is the whole-cluster plan deploy.sh uses.
+func parseMembers(list string, n int) ([]int, error) {
+	var vms []int
+	if list == "" {
+		for i := 1; i <= n; i++ {
+			vms = append(vms, i)
+		}
+		return vms, nil
+	}
+	for _, f := range strings.Split(list, ",") {
+		m, err := strconv.Atoi(strings.TrimSpace(f))
+		if err != nil {
+			return nil, fmt.Errorf("-members: %v", err)
+		}
+		vms = append(vms, m)
+	}
+	sort.Ints(vms)
+	return vms, nil
 }
 
 func fatalf(format string, args ...any) {
@@ -272,29 +302,6 @@ func generateLog(w io.Writer, cfg config, patterns []pattern, fileIdx int) (file
 			return st, err
 		}
 		st.bytes += int64(n)
-		st.lines++
 	}
 	return st, nil
-}
-
-func printSummary(path string, patterns []pattern, st fileStats) {
-	fmt.Printf("Wrote %s (%d lines, %.1f MiB)\n", path, st.lines, float64(st.bytes)/(1<<20))
-	fmt.Println("\npattern occurrences in this file:")
-	for _, p := range patterns {
-		scope := "all"
-		if p.scope != "ALL" {
-			idxs := make([]int, 0, len(p.files))
-			for idx := range p.files {
-				idxs = append(idxs, idx)
-			}
-			sort.Ints(idxs)
-			names := make([]string, len(idxs))
-			for i, idx := range idxs {
-				names[i] = fmt.Sprintf("%d", idx)
-			}
-			scope = strings.Join(names, ",")
-		}
-		fmt.Printf("%-10s rate=%-8g scope=%-12s occurrences=%-6d grep for: %q\n",
-			p.id, p.rate, scope, st.counts[p.id], p.phrase)
-	}
 }
