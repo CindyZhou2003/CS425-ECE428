@@ -117,8 +117,9 @@ NETID=YOUR_NETID go test -v -run 'TestDistributedGrep/VMs=8/OPT_'
 `bench` measures the time from sending a grep to every VM until all results are received.
 Printing is excluded, since it would dominate for frequent patterns. It queries the
 frequent / infrequent / rare phrases planted in every log, plus a `none` baseline that matches
-nothing (grep still scans the whole file, so it shows the fixed cost of a query). It runs warm-up queries first
-so the logs are in the page cache, and reports mean, sample standard deviation, min and max.
+nothing (grep still scans the whole file, so it shows the fixed cost of a query). It reports mean,
+sample standard deviation, min and max. The logs stay in the page cache once `genlog` has written them,
+so these are warm-cache latencies.
 
 Run it **on a VM** (e.g. VM 1) after `./deploy.sh all`. From a laptop over VPN you would
 mostly be measuring your own bandwidth:
@@ -126,5 +127,4 @@ mostly be measuring your own bandwidth:
 ```bash
 ssh YOUR_NETID@fa26-cs425-2301.cs.illinois.edu
 ./mp1-linux bench -vms 4,6,8,10 -trials 20  # one row per (VMs, pattern)
-./mp1-linux bench -warmup 0 -trials 5       # cold-ish: include the first read from disk
 ```

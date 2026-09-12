@@ -31,7 +31,6 @@ var benchPatterns = []struct {
 func runBench(args []string) {
 	fs := flag.NewFlagSet("bench", flag.ExitOnError)
 	trials := fs.Int("trials", 5, "measured queries per pattern and cluster size")
-	warmup := fs.Int("warmup", 1, "unmeasured queries run first, so every log is already in the page cache")
 	vmsFlag := fs.String("vms", "", "comma-separated cluster sizes, each using the first K hosts in host.txt (default: all hosts)")
 	fs.Parse(args)
 
@@ -55,17 +54,11 @@ func runBench(args []string) {
 		}
 	}
 
-	fmt.Printf("%d measured trials per row, %d warm-up\n\n", *trials, *warmup)
+	fmt.Printf("%d measured trials per row\n\n", *trials)
 	fmt.Printf("%-4s %-11s %10s %10s %10s %10s %10s\n", "VMs", "pattern", "matches", "mean", "stddev", "min", "max")
 
 	for _, k := range sizes {
 		for _, p := range benchPatterns {
-			for range *warmup {
-				if _, _, err := measureQuery(servers[:k], p.args); err != nil {
-					fatalf("warm-up for %s on %d VMs: %v", p.label, k, err)
-				}
-			}
-
 			latencies := make([]float64, *trials) // milliseconds
 			matches := 0
 			for i := range latencies {
