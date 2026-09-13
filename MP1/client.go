@@ -14,10 +14,10 @@ import (
 	"time"
 )
 
-// hostsFile lets the VM list change without recompiling.
+// one host:port per line
 const hostsFile = "host.txt"
 
-// loadServers reads one host:port per line, skipping blanks and # comments.
+// Skips blank lines and # comments
 func loadServers() ([]string, error) {
 	data, err := os.ReadFile(hostsFile)
 	if err != nil {
@@ -45,39 +45,9 @@ type nodeResult struct {
 }
 
 func runClient(args []string) {
-	// Counts only by default: a broad pattern matches six figures of lines, and
-	// rendering those to a terminal takes far longer than the query itself.
-	// --summary is kept as a no-op since it names what now happens anyway.
-	showLines := false
-	var grepArgs []string
-	for _, a := range args {
-		switch a {
-		case "--lines":
-			showLines = true
-		case "--summary":
-		default:
-			grepArgs = append(grepArgs, a)
-		}
-	}
-	args = grepArgs
-
 	if len(args) < 1 {
-		fmt.Println("Usage: mp1 client [--lines] [grep options...] <pattern>")
-		fmt.Println("  --lines   also print each matching line, tagged with its log file")
+		fmt.Println("Usage: mp1 client [grep options...] <pattern>")
 		return
-	}
-
-	// The server derives its match count from how many lines grep printed. These
-	// flags replace those lines with a count, a file name, or nothing, so the
-	// count would come back as 1 or 0 with no sign anything went wrong.
-	for _, a := range args {
-		switch a {
-		case "-c", "--count", "-l", "--files-with-matches",
-			"-L", "--files-without-match", "-q", "--quiet", "--silent":
-			fmt.Printf("error: %s suppresses grep's matching lines, which is how each node counts.\n", a)
-			fmt.Println("Per-node counts are printed by default; drop this flag.")
-			return
-		}
 	}
 
 	serverList, err := loadServers()
@@ -89,28 +59,21 @@ func runClient(args []string) {
 
 	results := queryAll(serverList, args)
 
-	// Printing only after every node has answered: concurrent writes to stdout
-	// get split apart once a response outgrows the pipe buffer, which shuffles
-	// one node's matching lines into another's.
-	if showLines {
-		out := bufio.NewWriter(os.Stdout)
-		for _, r := range results {
-			if r.err != nil {
-				continue
-			}
-			// Tag each line with its source, the way grep does when given more
-			// than one file. Base name only: the server is started with an
-			// absolute path, and repeating /home/<netid>/ on every line buries
-			// the part that differs. The table below maps file back to host.
-			name := filepath.Base(r.logFile)
-			for _, line := range strings.Split(strings.TrimSuffix(r.lines, "\n"), "\n") {
-				if line != "" {
-					fmt.Fprintf(out, "%s: %s\n", name, line)
-				}
+	// Print after all nodes finish so lines from different nodes don't interleave
+	out := bufio.NewWriter(os.Stdout)
+	for _, r := range results {
+		if r.err != nil {
+			continue
+		}
+		// prefix with the file name, like grep does with multiple files
+		name := filepath.Base(r.logFile)
+		for _, line := range strings.Split(strings.TrimSuffix(r.lines, "\n"), "\n") {
+			if line != "" {
+				fmt.Fprintf(out, "%s: %s\n", name, line)
 			}
 		}
-		out.Flush()
 	}
+	out.Flush()
 
 	total := 0
 	fmt.Printf("\n--- Matches %q per node ---\n", args)
@@ -125,9 +88,7 @@ func runClient(args []string) {
 	fmt.Printf("%-38s %-16s %10d\n", "TOTAL", "", total)
 }
 
-// queryAll sends the grep to every server concurrently. Each goroutine owns one
-// slot, so results follow the server list order rather than whichever node
-// answered first.
+// Queries all servers in parallel
 func queryAll(servers []string, grepArgs []string) []nodeResult {
 	results := make([]nodeResult, len(servers))
 	var wg sync.WaitGroup
@@ -145,7 +106,6 @@ func queryAll(servers []string, grepArgs []string) []nodeResult {
 func queryNode(target string, grepArgs []string) nodeResult {
 	res := nodeResult{addr: target}
 
-	// Enforce a 2-second timeout to handle down/unresponsive machines gracefully
 	conn, err := net.DialTimeout("tcp", target, 2*time.Second)
 	if err != nil {
 		res.err = err
@@ -153,7 +113,7 @@ func queryNode(target string, grepArgs []string) nodeResult {
 	}
 	defer conn.Close()
 
-	// The server decodes one JSON array per connection, then execs grep with it.
+	// send grep args as one JSON line
 	payload, err := json.Marshal(grepArgs)
 	if err != nil {
 		res.err = err
@@ -174,7 +134,7 @@ func queryNode(target string, grepArgs []string) nodeResult {
 		return res
 	}
 
-	// The response is "[<logfile>] Matches: <n>" then the matching lines.
+	// first line has the file name and match count, the rest are matching lines
 	header, lines, _ := strings.Cut(string(rawOutput), "\n")
 	res.lines = lines
 	if name, count, ok := strings.Cut(header, "] Matches: "); ok {

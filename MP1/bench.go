@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-// benchPatterns use the ALL-scope phrases so every VM greps and returns
-// matches; with ONE or SOME scope most VMs would answer with nothing, and the
-// latency would not reflect the whole cluster. "none" matches no line: grep
-// still scans the whole file, so it is the baseline cost of a query with
-// nothing to send back.
 var benchPatterns = []struct {
 	label string
 	args  []string
@@ -24,10 +19,7 @@ var benchPatterns = []struct {
 	{"none", []string{"-F", "this phrase is never planted in any log"}},
 }
 
-// runBench measures query latency: the time from sending a grep to every VM
-// until all their results have been received, which is what the client does
-// before it prints anything. Printing is left out on purpose, since rendering
-// a frequent pattern's matches to a terminal takes longer than the query.
+// Times each query from sending until the last VM replies
 func runBench(args []string) {
 	fs := flag.NewFlagSet("bench", flag.ExitOnError)
 	trials := fs.Int("trials", 5, "measured queries per pattern and cluster size")
@@ -76,9 +68,7 @@ func runBench(args []string) {
 	}
 }
 
-// measureQuery times one distributed query. A VM that fails makes the whole
-// measurement invalid: the client would wait out its dial timeout, and the
-// number would measure that timeout instead of grep.
+// Fails if any VM fails, otherwise the time would just be the dial timeout
 func measureQuery(servers []string, grepArgs []string) (time.Duration, int, error) {
 	start := time.Now()
 	results := queryAll(servers, grepArgs)
@@ -94,7 +84,6 @@ func measureQuery(servers []string, grepArgs []string) (time.Duration, int, erro
 	return elapsed, total, nil
 }
 
-// summarize returns the mean, sample standard deviation, min and max.
 func summarize(xs []float64) (mean, sd, lo, hi float64) {
 	lo, hi = xs[0], xs[0]
 	for _, x := range xs {

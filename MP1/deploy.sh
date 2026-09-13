@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 #
-# Deploy and control the distributed log querier across the course VMs.
-#
-# The node list comes from host.txt so there is only one place to edit: line N
-# of that file is VM N, and it receives logs/machine.N.log. Another group only
-# has to replace host.txt with their own hostnames.
+# Deploy and manage the grep servers on the VMs
+# Line N of host.txt is VM N, which uses machine.N.log
 #
 #   NETID=your_netid ./deploy.sh all
 #
@@ -37,18 +34,11 @@ Environment:
   SEED      log generation seed, shared by every node (default: 42)
   MB        size of each node's log file in MiB (default: 60)
 
-Node list is read from host.txt: line N is VM N and generates machine.N.log.
-Each node runs genlog itself rather than receiving a copy, so deploying moves
-a 5 MB binary instead of MB x N of logs. Generation is seeded per file, so a
-node's log depends only on SEED, MB, the cluster size, and its own index.
-
-Set up passwordless ssh first, otherwise every step prompts for a password:
-  ssh-keygen -t ed25519
-  ssh-copy-id your_netid@<each host>
+See README.md for details.
 USAGE
 }
 
-# read_nodes fills NODES with "host:port" entries, skipping blanks and comments.
+# read host:port lines from host.txt into NODES
 read_nodes() {
 	NODES=()
 	if [ ! -f "$HOSTS_FILE" ]; then
@@ -89,9 +79,7 @@ cmd_push() {
 	done
 }
 
-# cmd_genlog asks every node to generate its own log file. The -only flag picks
-# that node's index out of the cluster-wide plan, so which patterns land in the
-# file (and how often) still matches the plan the test verifies against.
+# each node generates its own log
 cmd_genlog() {
 	read_nodes
 	local total="${#NODES[@]}"
@@ -101,8 +89,7 @@ cmd_genlog() {
 	for node in "${NODES[@]}"; do
 		n=$((n + 1))
 		host="${node%:*}"
-		# Backgrounded: each node generates independently, so the wall time is
-		# one file's worth rather than the sum over the cluster.
+		# in background so all nodes generate at the same time
 		(
 			out=$(ssh $SSH_OPTS "$NETID@$host" \
 				"~/$BINARY genlog -n $total -only $n -seed $SEED -mb $MB -outdir ~ -prefix machine. >/dev/null &&
@@ -125,10 +112,8 @@ cmd_start() {
 		host="${node%:*}"
 		port="${node##*:}"
 		echo "==> start $host  port $port  machine.$n.log"
-		# pkill -x matches the process name only. With -f it would also match the
-		# shell running this very command (its command line contains "$BINARY
-		# server") and kill the session out from under us.
-		# </dev/null stops ssh from waiting on the backgrounded server.
+		# -x, not -f, or it also kills this ssh shell
+		# redirect stdin so ssh doesn't wait on the server
 		out=$(ssh $SSH_OPTS "$NETID@$host" "
 			pkill -x $BINARY
 			sleep 1
@@ -164,7 +149,7 @@ cmd_status() {
 	for node in "${NODES[@]}"; do
 		host="${node%:*}"
 		port="${node##*:}"
-		# -x, not -f: see the note in cmd_start.
+		# -x, see cmd_start
 		state=$(ssh $SSH_OPTS "$NETID@$host" \
 			"pgrep -x $BINARY >/dev/null && echo RUNNING || echo DOWN" 2>/dev/null) ||
 			state="UNREACHABLE"

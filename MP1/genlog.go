@@ -66,8 +66,7 @@ var phrases = map[string]map[string]string{
 	},
 }
 
-// Defaults shared by the genlog CLI and the distributed test, so a cluster
-// deployed with `deploy.sh genlog` matches the ground truth the test computes.
+// Shared by genlog and the test, so logs from deploy.sh match what the test expects
 const (
 	defaultSeed     = 42
 	defaultSizeMB   = 60
@@ -75,14 +74,13 @@ const (
 	defaultMidRate  = 0.01
 	defaultFreqRate = 0.08
 
-	// 2026-01-01T00:00:00Z. Fixed so generation is fully reproducible.
+	// 2026-01-01 00:00 UTC
 	baseEpoch = 1767225600
 )
 
-// config is the cluster-wide generation plan. Every VM must use the same one,
-// differing only in which file index it writes.
+// Must be the same on every VM, only the file index differs
 type config struct {
-	members     []int // ascending host.txt indices of the cluster's VMs; VM N writes machine.N.log
+	members     []int // sorted VM indices; VM N writes machine.N.log
 	targetBytes int64
 	seed        int64
 	rareRate    float64
@@ -94,7 +92,7 @@ func (cfg config) validate() error {
 	if len(cfg.members) < 1 {
 		return fmt.Errorf("cluster must have at least 1 VM, got %v", cfg.members)
 	}
-	// Ascending and unique, so every VM derives the same ONE and SOME sets.
+	// sorted and unique, so every VM computes the same ONE/SOME sets
 	for i, m := range cfg.members {
 		if m < 1 || (i > 0 && m <= cfg.members[i-1]) {
 			return fmt.Errorf("members must be distinct VM indices >= 1, got %v", cfg.members)
@@ -103,26 +101,24 @@ func (cfg config) validate() error {
 	if cfg.targetBytes <= 0 {
 		return fmt.Errorf("target size must be positive, got %d bytes", cfg.targetBytes)
 	}
-	// A file can match all three scopes, so its rates sum to 3x. Past 1.0 the
-	// last patterns would fall outside [0,1) and never fire.
+	// A file can be in all 3 scopes, so rates add up 3 times; over 1 some
+	// patterns never get picked
 	if total := 3 * (cfg.rareRate + cfg.midRate + cfg.freqRate); total > 1 {
 		return fmt.Errorf("rates too high: 3*(rare+mid+freq) = %g, must be <= 1", total)
 	}
 	return nil
 }
 
-// fileStats is the ground truth for one generated log file.
+// Expected size and per-pattern counts of one log file
 type fileStats struct {
 	bytes  int64
-	counts map[string]int // pattern id -> planted occurrences in this file
+	counts map[string]int // pattern id -> count
 }
 
-// fileRNG derives an independent stream per log file. Seeding per file (rather
-// than running one stream across all of them) is what lets each VM generate
-// only its own machine.N.log while the test replays any file's stream to get
-// its exact contents.
+// Seeded per file, so a VM can generate just its own log and the test can
+// recompute any one file
 func fileRNG(seed int64, fileIdx int) *rand.Rand {
-	s := uint64(seed)*0x9E3779B97F4A7C15 + uint64(fileIdx)*0xBF58476D1CE4E5B9
+	s := uint64(seed) + uint64(fileIdx)
 	s ^= s >> 31
 	return rand.New(rand.NewSource(int64(s)))
 }
@@ -135,10 +131,9 @@ func buildPatterns(cfg config) []pattern {
 		all[m] = true
 	}
 
-	// Its own stream, so the SOME set depends only on (seed, members) and every
-	// VM independently picks the same subset.
+	// separate RNG so every VM picks the same SOME set
 	some := make(map[int]bool)
-	someRNG := rand.New(rand.NewSource(cfg.seed ^ 0x5DEECE66D))
+	someRNG := rand.New(rand.NewSource(cfg.seed))
 	numSome := max(n/2, 1)
 	for _, i := range someRNG.Perm(n)[:numSome] {
 		some[cfg.members[i]] = true
@@ -171,7 +166,7 @@ func buildPatterns(cfg config) []pattern {
 	return patterns
 }
 
-// runGenlog is run on each VM to write that VM's own log file.
+// Writes this VM's log file
 func runGenlog(args []string) {
 	fs := flag.NewFlagSet("genlog", flag.ExitOnError)
 	var (
@@ -217,8 +212,7 @@ func runGenlog(args []string) {
 	}
 }
 
-// parseMembers turns -members into the cluster's ascending VM indices. Without
-// it the cluster is VMs 1..n, which is the whole-cluster plan deploy.sh uses.
+// Sorted VM indices from -members, or 1..n if empty
 func parseMembers(list string, n int) ([]int, error) {
 	var vms []int
 	if list == "" {
@@ -259,17 +253,13 @@ func writeLogFile(path string, cfg config, patterns []pattern, fileIdx int) (fil
 	return st, err
 }
 
-// generateLog writes log file fileIdx of the cluster plan to w: random lines
-// with the planted patterns mixed in, until cfg.targetBytes is reached. The
-// test calls it with io.Discard to get a VM's exact counts without the file.
+// Random lines mixed with planted patterns until the target size;
+// the test also uses it to get the counts without writing a file
 func generateLog(w io.Writer, cfg config, patterns []pattern, fileIdx int) (fileStats, error) {
 	st := fileStats{counts: make(map[string]int, len(patterns))}
 	rng := fileRNG(cfg.seed, fileIdx)
 
-	// Start at a fixed instant in UTC rather than time.Now(): the content must
-	// not depend on when or where it is generated, and both the date and the
-	// zone offset are part of every line's length. Timestamps advance by a
-	// small random jitter per line, so entries stay ordered.
+	// Fixed start time so every run gives the same bytes (the test checks file size)
 	ts := time.Unix(baseEpoch, 0).UTC().Add(time.Duration(rng.Intn(24*3600)) * time.Second)
 
 	for st.bytes < cfg.targetBytes {
@@ -279,9 +269,9 @@ func generateLog(w io.Writer, cfg config, patterns []pattern, fileIdx int) (file
 		component := components[rng.Intn(len(components))]
 		verb := verbs[rng.Intn(len(verbs))]
 		noun := nouns[rng.Intn(len(nouns))]
-		pid := 1000 + rng.Intn(9000) // process ID
+		pid := 1000 + rng.Intn(9000)
 
-		// each line matches at most one pattern through a weighted random draw
+		// at most one planted pattern per line
 		msg := fmt.Sprintf("%s %s", verb, noun)
 		u, cum := rng.Float64(), 0.0
 		for _, p := range patterns {

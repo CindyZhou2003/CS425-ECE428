@@ -52,6 +52,7 @@ func handleConnection(conn net.Conn, logFile string) {
 	cmd := exec.Command("grep", finalArgs...)
 	output, err := cmd.Output()
 
+	// grep exits 1 when nothing matches, so any error counts as 0
 	outputStr := string(output)
 	var lineCount int
 	if err != nil || len(strings.TrimSpace(outputStr)) == 0 {
