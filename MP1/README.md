@@ -26,7 +26,12 @@ MP1/
 ├── genlog.go             generates reproducible test logs with planted lines
 ├── bench.go              measures query latency (mean / stddev)
 ├── distributed_test.go   end-to-end test on the real VMs
-├── deploy.sh             build, push, generate logs, start / stop servers
+├── deploy_mp.sh          kill + build + push + start on every VM (--logs also uploads logs/)
+├── run_mp.sh             start the MP on given VM(s)
+├── kill_mp.sh            SIGKILL the MP on given VM(s)
+├── push_logs.sh          upload logs/machine.N.log to VM N
+├── mp_common.sh          shared helpers for the scripts above
+├── deploy.sh             older flow with genlog, used by the Test section
 └── host.txt              VM list, one host:port per line (line N = VM N, uses machine.N.log)
 ```
 VM host: `fa26-cs425-23NN.cs.illinois.edu`
@@ -42,23 +47,22 @@ done
 # Input your password for 10 times
 ```
 
-2. Deploy (and redeploy after changing code)
+2. Deploy (and redeploy after changing code). VM N serves `~/machine.N.log`, uploaded from local `logs/`
 ``` bash
 cd MP1
-NETID=YOUR_NETID ./deploy.sh all # compile + push binary + each VM generates its own 60MB log + start + check
+export NETID=YOUR_NETID
+./deploy_mp.sh --logs  # first time: kill + build + push binary/host.txt + upload logs + start
+./deploy_mp.sh         # after a code change: same, logs already on the VMs
 ```
 
-Other commands in `deploy.sh`
+Other scripts, every one prints `VM, PID` pairs
 ``` bash
-./deploy.sh build    # cross-compile mp1-linux (linux/amd64)
-./deploy.sh push     # copy binary + host.txt to every VM
-./deploy.sh genlog   # each VM generates its own machine.N.log
-./deploy.sh start    # (re)start servers
-./deploy.sh stop     # stop servers
-./deploy.sh status   # which VMs are running
+./run_mp.sh 3          # start the MP on VM 3 (several: ./run_mp.sh 3 5 7)
+./kill_mp.sh 3         # SIGKILL the MP on VM 3
+./push_logs.sh         # upload logs/machine.N.log to VM N, one by one (or ./push_logs.sh 3)
 ```
-Env vars: `NETID` (default `$USER`), `SEED` (default 42), `MB` (default 60).
-Regenerate one VM's log by hand, on that VM: `./mp1-linux genlog -n 10 -only N`
+Env var: `NETID` (default `$USER`).
+`deploy.sh` still generates synthetic logs with `genlog`, and the Test section below uses it.
 
 3. Execute grep
 ``` bash
@@ -98,8 +102,8 @@ ssh YOUR_NETID@fa26-cs425-2301.cs.illinois.edu # connect to one VM
 ./mp1-linux client -F "unrecoverable disk corruption" # 160 lines, all from machine.1.log
 ./mp1-linux client -c "heartbeat"  # each VM shows 1 (grep prints one count line)
 ```
-Fail-stop: run `pkill -x mp1-linux` on a VM, the client shows it as `UNREACHABLE` and still counts the rest.
-`./deploy.sh start` brings it back.
+Fail-stop: `./kill_mp.sh N`, the client shows VM N as `UNREACHABLE` and still counts the rest.
+`./run_mp.sh N` brings it back.
 
 ## Test
 ``` bash
