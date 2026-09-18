@@ -34,15 +34,18 @@ type SuspectRecord struct {
 type MembershipTable struct {
 	mu             sync.RWMutex
 	SelfID         string
+	// TODO: drop these copies, the self entry already holds them and every write must update both
 	Incarnation    uint64
 	Heartbeat      uint64
 	UseSuspicion   bool
 	Members        map[string]*MemberEntry
+	// FIX: record this node's own timeout suspicions here, not only gossiped ones
 	SuspectHistory []SuspectRecord
 }
 
 // NewMembershipTable creates and initializes a membership table instance
 func NewMembershipTable(selfID string, useSuspicion bool) *MembershipTable {
+	// TODO: drop zero-value fields and fold InitSelf into this constructor
 	return &MembershipTable{
 		SelfID:         selfID,
 		Incarnation:    0,
@@ -110,12 +113,15 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 				t.Members[t.SelfID].LocalTime = now
 				LogEvent("[REFUTE] Self was suspected; refuted with incarnation %d", t.Incarnation)
 			}
+			// FIX: also react to being gossiped as DEAD, otherwise this node keeps gossiping under an ID the group removed
 			continue
 		}
 
 		existing, exists := t.Members[inc.ID]
+		// FIX: skip existing DEAD/LEFT entries here so a confirmed failure is never rescinded
 
 		// Add new member if not previously known and not dead/left
+		// FIX: consult a tombstone set so stale gossip doesn't re-add a node the sweep already deleted
 		if !exists {
 			if inc.Status != StatusDead && inc.Status != StatusLeft {
 				t.Members[inc.ID] = &MemberEntry{
@@ -135,6 +141,7 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 			if inc.Heartbeat > existing.Heartbeat {
 				existing.Heartbeat = inc.Heartbeat
 				existing.LocalTime = now
+				// FIX: resurrects DEAD/LEFT when a peer that heard from the node more recently gossips a higher heartbeat
 				if existing.Status != StatusAlive && inc.Status == StatusAlive {
 					existing.Status = StatusAlive
 					LogEvent("[MEMBERSHIP] Member recovered to ALIVE: %s", inc.ID)
@@ -145,10 +152,12 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 				existing.LocalTime = now
 				LogEvent("[MEMBERSHIP] Communicated leave: %s", inc.ID)
 			}
+			// FIX: gossiped DEAD is dropped here, so nodes in different modes disagree on failures
 			continue
 		}
 
 		// Merge logic for Gossip+S mode (Incarnation prioritized over Heartbeat)
+		// FIX: overwrites a confirmed DEAD with ALIVE when a late refutation arrives
 		if inc.Incarnation > existing.Incarnation {
 			existing.Incarnation = inc.Incarnation
 			existing.Heartbeat = inc.Heartbeat
@@ -192,6 +201,7 @@ func (t *MembershipTable) GetSnapshot() []MemberEntry {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 
+	// TODO: entries grow with every past failure until the sweep deletes them, inflating gossip bandwidth
 	snapshot := make([]MemberEntry, 0, len(t.Members))
 	for _, entry := range t.Members {
 		snapshot = append(snapshot, *entry)

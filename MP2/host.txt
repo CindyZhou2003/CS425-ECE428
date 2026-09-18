@@ -1,0 +1,10 @@
+fa26-cs425-2301.cs.illinois.edu:8001
+fa26-cs425-2302.cs.illinois.edu:8001
+fa26-cs425-2303.cs.illinois.edu:8001
+fa26-cs425-2304.cs.illinois.edu:8001
+fa26-cs425-2305.cs.illinois.edu:8001
+fa26-cs425-2306.cs.illinois.edu:8001
+fa26-cs425-2307.cs.illinois.edu:8001
+fa26-cs425-2308.cs.illinois.edu:8001
+fa26-cs425-2309.cs.illinois.edu:8001
+fa26-cs425-2310.cs.illinois.edu:8001
