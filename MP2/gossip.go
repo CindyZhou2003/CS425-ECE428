@@ -25,16 +25,11 @@ const (
 	maxPacket      = 64 * 1024
 )
 
-const (
-	msgGossip = "gossip"
-	msgJoin   = "join"
-)
-
 type message struct {
-	Type        string        `json:"type"`
-	Members     []MemberEntry `json:"members"`
-	Suspicion   bool          `json:"suspicion"`
-	ModeVersion uint64        `json:"mode_version"`
+	Join      bool          `json:"join"`
+	Members   []MemberEntry `json:"members"`
+	Suspicion bool          `json:"suspicion"`
+	Version   uint64        `json:"version"`
 }
 
 // Stored as float64 bits so the receive loop reads it without a lock; survives leave/rejoin
@@ -53,10 +48,10 @@ type Node struct {
 	conn         *net.UDPConn
 	introducer   *net.UDPAddr
 	isIntroducer bool
-	done         chan struct{}
+	done         chan struct{} // close signal
 
-	modeMu      sync.Mutex
-	modeVersion uint64
+	versionMu sync.Mutex
+	version   uint64
 }
 
 func NewNode(port int, introducer string, suspicion bool) (*Node, error) {
@@ -114,7 +109,7 @@ func (n *Node) requestJoin() {
 		if len(n.Table.GetSnapshot()) > 1 {
 			return
 		}
-		n.send(n.introducer.String(), n.encode(msgJoin, n.Table.GetSnapshot()))
+		n.send(n.introducer.String(), n.encode(true, n.Table.GetSnapshot()))
 		select {
 		case <-n.done:
 			return
@@ -134,7 +129,7 @@ func (n *Node) Leave() {
 
 	peers := n.Table.GetActivePeerAddresses()
 	for range leaveRounds {
-		payload := n.encode(msgGossip, n.Table.GetSnapshot())
+		payload := n.encode(false, n.Table.GetSnapshot())
 		for _, p := range peers {
 			n.send(p, payload)
 		}
@@ -151,14 +146,14 @@ func (n *Node) gossipLoop() {
 		case <-n.done:
 			return
 		case <-ticker.C:
-		}
-		n.Table.IncrementHeartbeat()
+			n.Table.IncrementHeartbeat()
 
-		peers := n.Table.GetActivePeerAddresses()
-		rand.Shuffle(len(peers), func(i, j int) { peers[i], peers[j] = peers[j], peers[i] })
-		payload := n.encode(msgGossip, n.Table.GetSnapshot())
-		for _, p := range peers[:min(gossipFanout, len(peers))] {
-			n.send(p, payload)
+			peers := n.Table.GetActivePeerAddresses()
+			rand.Shuffle(len(peers), func(i, j int) { peers[i], peers[j] = peers[j], peers[i] })
+			payload := n.encode(false, n.Table.GetSnapshot())
+			for _, p := range peers[:min(gossipFanout, len(peers))] {
+				n.send(p, payload)
+			}
 		}
 	}
 }
@@ -184,9 +179,9 @@ func (n *Node) receiveLoop() {
 		n.adoptMode(msg)
 		n.Table.MergeMemberList(msg.Members)
 
-		if msg.Type == msgJoin && n.isIntroducer {
+		if msg.Join && n.isIntroducer {
 			LogEvent("[JOIN] Join request from %s", src)
-			n.send(src.String(), n.encode(msgGossip, n.Table.GetSnapshot()))
+			n.send(src.String(), n.encode(false, n.Table.GetSnapshot()))
 		}
 	}
 }
@@ -220,7 +215,7 @@ func (t *MembershipTable) sweep(now time.Time) {
 				delete(t.Members, id)
 				LogEvent("[MEMBERSHIP] Removed %s (%s)", id, e.Status)
 			}
-		case !t.UseSuspicion:
+		case !t.UseSuspicion: // nosuspect: silence before declaring DEAD
 			if idle > failTimeout {
 				e.Status = StatusDead
 				e.LocalTime = now
@@ -243,25 +238,25 @@ func (t *MembershipTable) sweep(now time.Time) {
 
 // Bumps the mode version so the switch spreads through gossip instead of staying local
 func (n *Node) SwitchMode(suspicion bool) {
-	n.modeMu.Lock()
-	defer n.modeMu.Unlock()
-	n.modeVersion++
+	n.versionMu.Lock()
+	defer n.versionMu.Unlock()
+	n.version++
 	n.Table.SetSuspicionMode(suspicion)
-	LogEvent("[PROTOCOL] Switched to %s (version %d)", isSuspect(suspicion), n.modeVersion)
+	LogEvent("[PROTOCOL] Switched to %s (version %d)", isSuspect(suspicion), n.version)
 }
 
 // Newer version wins; on a tie from concurrent switches, suspect wins so the group still converges
 func (n *Node) adoptMode(msg message) {
-	n.modeMu.Lock()
-	defer n.modeMu.Unlock()
+	n.versionMu.Lock()
+	defer n.versionMu.Unlock()
 	cur := n.Table.IsSuspicionEnabled()
-	if msg.ModeVersion < n.modeVersion || (msg.ModeVersion == n.modeVersion && (msg.Suspicion == cur || cur)) {
+	if msg.Version < n.version || (msg.Version == n.version && (msg.Suspicion == cur || cur)) {
 		return
 	}
-	n.modeVersion = msg.ModeVersion
+	n.version = msg.Version
 	if msg.Suspicion != cur {
 		n.Table.SetSuspicionMode(msg.Suspicion)
-		LogEvent("[PROTOCOL] Adopted %s from gossip (version %d)", isSuspect(msg.Suspicion), msg.ModeVersion)
+		LogEvent("[PROTOCOL] Adopted %s from gossip (version %d)", isSuspect(msg.Suspicion), msg.Version)
 	}
 }
 
@@ -272,10 +267,10 @@ func isSuspect(suspicion bool) string {
 	return "nosuspect"
 }
 
-func (n *Node) encode(kind string, members []MemberEntry) []byte {
-	n.modeMu.Lock()
-	msg := message{Type: kind, Members: members, Suspicion: n.Table.IsSuspicionEnabled(), ModeVersion: n.modeVersion}
-	n.modeMu.Unlock()
+func (n *Node) encode(join bool, members []MemberEntry) []byte {
+	n.versionMu.Lock()
+	msg := message{Join: join, Members: members, Suspicion: n.Table.IsSuspicionEnabled(), Version: n.version}
+	n.versionMu.Unlock()
 	payload, _ := json.Marshal(msg) // plain structs, can't fail
 	return payload
 }
