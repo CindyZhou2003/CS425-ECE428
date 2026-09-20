@@ -32,24 +32,20 @@ type SuspectRecord struct {
 
 // MembershipTable manages concurrent access to the membership list
 type MembershipTable struct {
-	mu             sync.RWMutex
-	SelfID         string
-	// TODO: drop these copies, the self entry already holds them and every write must update both
-	Incarnation    uint64
-	Heartbeat      uint64
-	UseSuspicion   bool
-	Members        map[string]*MemberEntry
-	// FIX: record this node's own timeout suspicions here, not only gossiped ones
+	mu sync.RWMutex
+
+	SelfID       string
+	UseSuspicion bool
+	Members      map[string]*MemberEntry
+
+	// Record our own suspicion events, including locally generated ones.
 	SuspectHistory []SuspectRecord
 }
 
 // NewMembershipTable creates and initializes a membership table instance
 func NewMembershipTable(selfID string, useSuspicion bool) *MembershipTable {
-	// TODO: drop zero-value fields and fold InitSelf into this constructor
 	return &MembershipTable{
 		SelfID:         selfID,
-		Incarnation:    0,
-		Heartbeat:      1,
 		UseSuspicion:   useSuspicion,
 		Members:        make(map[string]*MemberEntry),
 		SuspectHistory: make([]SuspectRecord, 0),
@@ -62,12 +58,11 @@ func (t *MembershipTable) InitSelf(selfID string) {
 	defer t.mu.Unlock()
 
 	t.SelfID = selfID
-	t.Heartbeat = 1
-	t.Incarnation = 0
+
 	t.Members[selfID] = &MemberEntry{
 		ID:          selfID,
-		Heartbeat:   t.Heartbeat,
-		Incarnation: t.Incarnation,
+		Heartbeat:   1,
+		Incarnation: 0,
 		Status:      StatusAlive,
 		LocalTime:   time.Now(),
 	}
@@ -78,11 +73,13 @@ func (t *MembershipTable) IncrementHeartbeat() {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	t.Heartbeat++
-	if entry, exists := t.Members[t.SelfID]; exists {
-		entry.Heartbeat = t.Heartbeat
-		entry.LocalTime = time.Now()
+	entry, exists := t.Members[t.SelfID]
+	if !exists {
+		return
 	}
+
+	entry.Heartbeat++
+	entry.LocalTime = time.Now()
 }
 
 // MarkSelfLeft marks the local node as LEFT
@@ -104,94 +101,312 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 	now := time.Now()
 
 	for _, inc := range incoming {
-		// Handle self node refutation under Gossip+S
+
+		// ============================================================
+		// 1. Handle gossip about ourselves
+		// ============================================================
 		if inc.ID == t.SelfID {
-			if t.UseSuspicion && inc.Status == StatusSuspect && inc.Incarnation >= t.Incarnation {
-				t.Incarnation = inc.Incarnation + 1
-				t.Members[t.SelfID].Incarnation = t.Incarnation
-				t.Members[t.SelfID].Status = StatusAlive
-				t.Members[t.SelfID].LocalTime = now
-				LogEvent("[REFUTE] Self was suspected; refuted with incarnation %d", t.Incarnation)
+			self, exists := t.Members[t.SelfID]
+			if !exists {
+				continue
 			}
-			// FIX: also react to being gossiped as DEAD, otherwise this node keeps gossiping under an ID the group removed
+
+			// If another node says that we are SUSPECT or DEAD,
+			// refute the claim with a newer incarnation number.
+			if (inc.Status == StatusSuspect || inc.Status == StatusDead) &&
+				inc.Incarnation >= self.Incarnation {
+
+				self.Incarnation = inc.Incarnation + 1
+				self.Status = StatusAlive
+				self.LocalTime = now
+
+				if inc.Status == StatusSuspect {
+					LogEvent(
+						"[REFUTE] Self was suspected; refuted with incarnation %d",
+						self.Incarnation,
+					)
+				} else {
+					LogEvent(
+						"[REFUTE] Self was marked DEAD; refuted with incarnation %d",
+						self.Incarnation,
+					)
+				}
+			}
+
+			// Do not merge another node's heartbeat into our own.
 			continue
 		}
 
+		// ============================================================
+		// 2. Find existing member
+		// ============================================================
 		existing, exists := t.Members[inc.ID]
-		// FIX: skip existing DEAD/LEFT entries here so a confirmed failure is never rescinded
 
-		// Add new member if not previously known and not dead/left
-		// FIX: consult a tombstone set so stale gossip doesn't re-add a node the sweep already deleted
+		// ============================================================
+		// 3. New member
+		// ============================================================
 		if !exists {
-			if inc.Status != StatusDead && inc.Status != StatusLeft {
-				t.Members[inc.ID] = &MemberEntry{
-					ID:          inc.ID,
-					Heartbeat:   inc.Heartbeat,
-					Incarnation: inc.Incarnation,
-					Status:      inc.Status,
-					LocalTime:   now,
-				}
-				LogEvent("[MEMBERSHIP] New member added: %s (Status: %s)", inc.ID, inc.Status)
+
+			// Do not add a node that arrives already DEAD or LEFT.
+			if inc.Status == StatusDead || inc.Status == StatusLeft {
+				continue
 			}
+
+			t.Members[inc.ID] = &MemberEntry{
+				ID:          inc.ID,
+				Heartbeat:   inc.Heartbeat,
+				Incarnation: inc.Incarnation,
+				Status:      inc.Status,
+				LocalTime:   now,
+			}
+
+			if inc.Status == StatusSuspect {
+				t.SuspectHistory = append(
+					t.SuspectHistory,
+					SuspectRecord{
+						ID:          inc.ID,
+						SuspectTime: now,
+					},
+				)
+
+				LogEvent(
+					"[SUSPECT] New member arrived as SUSPECT: %s (Incarnation %d)",
+					inc.ID,
+					inc.Incarnation,
+				)
+			} else {
+				LogEvent(
+					"[MEMBERSHIP] New member added: %s (Status: %s)",
+					inc.ID,
+					inc.Status,
+				)
+			}
+
 			continue
 		}
 
-		// Merge logic for pure Gossip mode
-		if !t.UseSuspicion {
-			if inc.Heartbeat > existing.Heartbeat {
-				existing.Heartbeat = inc.Heartbeat
+		// ============================================================
+		// 4. DEAD / LEFT are terminal local states
+		// ============================================================
+		//
+		// Once we have already confirmed a member as DEAD or LEFT,
+		// a later ALIVE/SUSPECT message must not resurrect it.
+		if existing.Status == StatusDead ||
+			existing.Status == StatusLeft {
+			continue
+		}
+
+		// ============================================================
+		// 5. Handle DEAD / LEFT before mode-specific merging
+		// ============================================================
+		//
+		// Both Gossip and Gossip+S need to learn about DEAD/LEFT.
+		// However, for Gossip+S, incarnation still determines whether
+		// the incoming state is newer.
+
+		if inc.Status == StatusDead {
+
+			if !t.UseSuspicion {
+				// Pure Gossip mode does not use incarnation numbers
+				// to determine freshness.
+				existing.Status = StatusDead
 				existing.LocalTime = now
-				// FIX: resurrects DEAD/LEFT when a peer that heard from the node more recently gossips a higher heartbeat
-				if existing.Status != StatusAlive && inc.Status == StatusAlive {
-					existing.Status = StatusAlive
-					LogEvent("[MEMBERSHIP] Member recovered to ALIVE: %s", inc.ID)
+
+				if inc.Heartbeat > existing.Heartbeat {
+					existing.Heartbeat = inc.Heartbeat
 				}
+
+				LogEvent(
+					"[FAILURE] Communicated failure: %s confirmed DEAD",
+					inc.ID,
+				)
+
+				continue
 			}
-			if inc.Status == StatusLeft && existing.Status != StatusLeft {
+
+			// Gossip+S: DEAD must have an incarnation that is at least
+			// as new as the current record.
+			if inc.Incarnation > existing.Incarnation {
+				existing.Incarnation = inc.Incarnation
+				existing.Heartbeat = inc.Heartbeat
+				existing.Status = StatusDead
+				existing.LocalTime = now
+
+				LogEvent(
+					"[FAILURE] Communicated failure: %s confirmed DEAD",
+					inc.ID,
+				)
+
+				continue
+			}
+
+			if inc.Incarnation == existing.Incarnation {
+				existing.Status = StatusDead
+
+				if inc.Heartbeat > existing.Heartbeat {
+					existing.Heartbeat = inc.Heartbeat
+				}
+
+				existing.LocalTime = now
+
+				LogEvent(
+					"[FAILURE] Communicated failure: %s confirmed DEAD",
+					inc.ID,
+				)
+
+				continue
+			}
+
+			// Older incarnation: ignore.
+			continue
+		}
+
+		if inc.Status == StatusLeft {
+
+			if !t.UseSuspicion {
 				existing.Status = StatusLeft
 				existing.LocalTime = now
-				LogEvent("[MEMBERSHIP] Communicated leave: %s", inc.ID)
+
+				if inc.Heartbeat > existing.Heartbeat {
+					existing.Heartbeat = inc.Heartbeat
+				}
+
+				LogEvent(
+					"[MEMBERSHIP] Communicated leave: %s",
+					inc.ID,
+				)
+
+				continue
 			}
-			// FIX: gossiped DEAD is dropped here, so nodes in different modes disagree on failures
+
+			if inc.Incarnation > existing.Incarnation {
+				existing.Incarnation = inc.Incarnation
+				existing.Heartbeat = inc.Heartbeat
+				existing.Status = StatusLeft
+				existing.LocalTime = now
+
+				LogEvent(
+					"[MEMBERSHIP] Communicated leave: %s",
+					inc.ID,
+				)
+
+				continue
+			}
+
+			if inc.Incarnation == existing.Incarnation {
+				existing.Status = StatusLeft
+
+				if inc.Heartbeat > existing.Heartbeat {
+					existing.Heartbeat = inc.Heartbeat
+				}
+
+				existing.LocalTime = now
+
+				LogEvent(
+					"[MEMBERSHIP] Communicated leave: %s",
+					inc.ID,
+				)
+
+				continue
+			}
+
+			// Older incarnation: ignore.
 			continue
 		}
 
-		// Merge logic for Gossip+S mode (Incarnation prioritized over Heartbeat)
-		// FIX: overwrites a confirmed DEAD with ALIVE when a late refutation arrives
+		// ============================================================
+		// 6. Pure Gossip mode
+		// ============================================================
+		if !t.UseSuspicion {
+
+			// In pure Gossip mode, heartbeat determines freshness.
+			if inc.Heartbeat > existing.Heartbeat {
+
+				existing.Heartbeat = inc.Heartbeat
+				existing.LocalTime = now
+
+				// A newer ALIVE heartbeat can update an ALIVE member.
+				// We already filtered DEAD/LEFT above.
+				if inc.Status == StatusAlive {
+					existing.Status = StatusAlive
+				}
+			}
+
+			continue
+		}
+
+		// ============================================================
+		// 7. Gossip+S mode
+		// ============================================================
+		//
+		// Incarnation is more important than heartbeat.
+
 		if inc.Incarnation > existing.Incarnation {
+
 			existing.Incarnation = inc.Incarnation
 			existing.Heartbeat = inc.Heartbeat
 			existing.Status = inc.Status
 			existing.LocalTime = now
 
 			if inc.Status == StatusSuspect {
-				t.SuspectHistory = append(t.SuspectHistory, SuspectRecord{ID: inc.ID, SuspectTime: now})
-				LogEvent("[SUSPECT] Communicated suspect: %s (Incarnation %d)", inc.ID, inc.Incarnation)
+				t.SuspectHistory = append(
+					t.SuspectHistory,
+					SuspectRecord{
+						ID:          inc.ID,
+						SuspectTime: now,
+					},
+				)
+
+				LogEvent(
+					"[SUSPECT] Communicated suspect: %s (Incarnation %d)",
+					inc.ID,
+					inc.Incarnation,
+				)
 			}
-		} else if inc.Incarnation == existing.Incarnation {
-			if existing.Status == StatusAlive && inc.Status == StatusSuspect {
+
+			continue
+		}
+
+		// ============================================================
+		// 8. Same incarnation
+		// ============================================================
+		if inc.Incarnation == existing.Incarnation {
+
+			// ALIVE -> SUSPECT is a valid transition.
+			if existing.Status == StatusAlive &&
+				inc.Status == StatusSuspect {
+
 				existing.Status = StatusSuspect
 				existing.LocalTime = now
-				t.SuspectHistory = append(t.SuspectHistory, SuspectRecord{ID: inc.ID, SuspectTime: now})
-				LogEvent("[SUSPECT] Communicated suspect: %s (Incarnation %d)", inc.ID, inc.Incarnation)
-			} else if inc.Heartbeat > existing.Heartbeat {
+
+				t.SuspectHistory = append(
+					t.SuspectHistory,
+					SuspectRecord{
+						ID:          inc.ID,
+						SuspectTime: now,
+					},
+				)
+
+				LogEvent(
+					"[SUSPECT] Communicated suspect: %s (Incarnation %d)",
+					inc.ID,
+					inc.Incarnation,
+				)
+
+				continue
+			}
+
+			// A newer heartbeat can update the member.
+			if inc.Heartbeat > existing.Heartbeat {
 				existing.Heartbeat = inc.Heartbeat
-				if existing.Status == StatusAlive {
+
+				// A heartbeat from an ALIVE member refreshes its timer.
+				// Do not automatically turn SUSPECT back into ALIVE.
+				if existing.Status == StatusAlive &&
+					inc.Status == StatusAlive {
 					existing.LocalTime = now
 				}
 			}
-		}
-
-		if inc.Status == StatusDead && existing.Status != StatusDead {
-			existing.Status = StatusDead
-			existing.LocalTime = now
-			LogEvent("[FAILURE] Communicated failure: %s confirmed DEAD", inc.ID)
-		}
-
-		if inc.Status == StatusLeft && existing.Status != StatusLeft {
-			existing.Status = StatusLeft
-			existing.LocalTime = now
-			LogEvent("[MEMBERSHIP] Communicated leave: %s", inc.ID)
 		}
 	}
 }
@@ -201,11 +416,12 @@ func (t *MembershipTable) GetSnapshot() []MemberEntry {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 
-	// TODO: entries grow with every past failure until the sweep deletes them, inflating gossip bandwidth
 	snapshot := make([]MemberEntry, 0, len(t.Members))
+
 	for _, entry := range t.Members {
 		snapshot = append(snapshot, *entry)
 	}
+
 	return snapshot
 }
 
@@ -215,14 +431,23 @@ func (t *MembershipTable) GetActivePeerAddresses() []string {
 	defer t.mu.RUnlock()
 
 	var targets []string
+
 	for id, entry := range t.Members {
-		if id != t.SelfID && entry.Status != StatusDead && entry.Status != StatusLeft {
+		if id != t.SelfID &&
+			entry.Status != StatusDead &&
+			entry.Status != StatusLeft {
+
 			parts := strings.Split(id, ":")
+
 			if len(parts) >= 2 {
-				targets = append(targets, fmt.Sprintf("%s:%s", parts[0], parts[1]))
+				targets = append(
+					targets,
+					fmt.Sprintf("%s:%s", parts[0], parts[1]),
+				)
 			}
 		}
 	}
+
 	return targets
 }
 
@@ -230,6 +455,7 @@ func (t *MembershipTable) GetActivePeerAddresses() []string {
 func (t *MembershipTable) SetSuspicionMode(enabled bool) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+
 	t.UseSuspicion = enabled
 }
 
@@ -237,6 +463,7 @@ func (t *MembershipTable) SetSuspicionMode(enabled bool) {
 func (t *MembershipTable) IsSuspicionEnabled() bool {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
+
 	return t.UseSuspicion
 }
 
@@ -247,5 +474,6 @@ func (t *MembershipTable) GetSuspectHistory() []SuspectRecord {
 
 	history := make([]SuspectRecord, len(t.SuspectHistory))
 	copy(history, t.SuspectHistory)
+
 	return history
 }
