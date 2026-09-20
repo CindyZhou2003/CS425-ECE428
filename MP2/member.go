@@ -17,11 +17,11 @@ const (
 
 // MemberEntry represents a single membership record
 type MemberEntry struct {
-	ID          string    `json:"id"`          // Format: <IP:Port:Timestamp>
-	Heartbeat   uint64    `json:"heartbeat"`   // Heartbeat sequence counter
-	Incarnation uint64    `json:"incarnation"` // Incarnation number for Suspicion mechanism
-	Status      string    `json:"status"`      // ALIVE, SUSPECT, DEAD, LEFT
-	LocalTime   time.Time `json:"-"`           // Local update timestamp for timer checks
+	ID          string    `json:"id"`
+	Heartbeat   uint64    `json:"heartbeat"`
+	Incarnation uint64    `json:"incarnation"`
+	Status      string    `json:"status"`
+	LocalTime   time.Time `json:"-"`
 }
 
 // SuspectRecord stores a history entry of suspected nodes
@@ -109,8 +109,7 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 				continue
 			}
 
-			// If another node says that we are SUSPECT or DEAD,
-			// refute the claim with a newer incarnation number.
+			// Refute SUSPECT or DEAD claims about ourselves.
 			if (inc.Status == StatusSuspect || inc.Status == StatusDead) &&
 				inc.Incarnation >= self.Incarnation {
 
@@ -131,16 +130,14 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 				}
 			}
 
-			// Do not merge another node's heartbeat into our own.
+			// Never merge another node's heartbeat into our own.
 			continue
 		}
 
 		// 2. Find existing member
-
 		existing, exists := t.Members[inc.ID]
 
 		// 3. New member
-
 		if !exists {
 
 			// Do not add a node that arrives already DEAD or LEFT.
@@ -180,57 +177,67 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 
 			continue
 		}
-
 		// 4. DEAD / LEFT are terminal local states
-		// Once we have already confirmed a member as DEAD or LEFT,
-		// a later ALIVE/SUSPECT message must not resurrect it.
-		if existing.Status == StatusDead || existing.Status == StatusLeft {
+
+		if existing.Status == StatusDead ||
+			existing.Status == StatusLeft {
 			continue
 		}
 
-		// 5. Handle DEAD / LEFT before mode-specific merging
-		// Both Gossip and Gossip+S need to learn about DEAD/LEFT.
-		// However, for Gossip+S, incarnation still determines whether
-		// the incoming state is newer.
-
-		if inc.Status == StatusDead {
+		// 5. Handle DEAD / LEFT
+		//
+		// DEAD and LEFT use the same merge logic.
+		// The actual status is preserved through inc.Status.
+		if inc.Status == StatusDead || inc.Status == StatusLeft {
 
 			if !t.UseSuspicion {
-				// Pure Gossip mode does not use incarnation numbers
-				// to determine freshness.
-				existing.Status = StatusDead
+				// Pure Gossip: heartbeat determines freshness.
+				existing.Status = inc.Status
 				existing.LocalTime = now
 
 				if inc.Heartbeat > existing.Heartbeat {
 					existing.Heartbeat = inc.Heartbeat
 				}
 
-				LogEvent(
-					"[FAILURE] Communicated failure: %s confirmed DEAD",
-					inc.ID,
-				)
+				if inc.Status == StatusDead {
+					LogEvent(
+						"[FAILURE] Communicated failure: %s confirmed DEAD",
+						inc.ID,
+					)
+				} else {
+					LogEvent(
+						"[MEMBERSHIP] Communicated leave: %s",
+						inc.ID,
+					)
+				}
 
 				continue
 			}
 
-			// Gossip+S: DEAD must have an incarnation that is at least
-			// as new as the current record.
+			// Gossip+S: incarnation determines freshness.
 			if inc.Incarnation > existing.Incarnation {
 				existing.Incarnation = inc.Incarnation
 				existing.Heartbeat = inc.Heartbeat
-				existing.Status = StatusDead
+				existing.Status = inc.Status
 				existing.LocalTime = now
 
-				LogEvent(
-					"[FAILURE] Communicated failure: %s confirmed DEAD",
-					inc.ID,
-				)
+				if inc.Status == StatusDead {
+					LogEvent(
+						"[FAILURE] Communicated failure: %s confirmed DEAD",
+						inc.ID,
+					)
+				} else {
+					LogEvent(
+						"[MEMBERSHIP] Communicated leave: %s",
+						inc.ID,
+					)
+				}
 
 				continue
 			}
 
 			if inc.Incarnation == existing.Incarnation {
-				existing.Status = StatusDead
+				existing.Status = inc.Status
 
 				if inc.Heartbeat > existing.Heartbeat {
 					existing.Heartbeat = inc.Heartbeat
@@ -238,63 +245,17 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 
 				existing.LocalTime = now
 
-				LogEvent(
-					"[FAILURE] Communicated failure: %s confirmed DEAD",
-					inc.ID,
-				)
-
-				continue
-			}
-
-			// Older incarnation: ignore.
-			continue
-		}
-
-		if inc.Status == StatusLeft {
-
-			if !t.UseSuspicion {
-				existing.Status = StatusLeft
-				existing.LocalTime = now
-
-				if inc.Heartbeat > existing.Heartbeat {
-					existing.Heartbeat = inc.Heartbeat
+				if inc.Status == StatusDead {
+					LogEvent(
+						"[FAILURE] Communicated failure: %s confirmed DEAD",
+						inc.ID,
+					)
+				} else {
+					LogEvent(
+						"[MEMBERSHIP] Communicated leave: %s",
+						inc.ID,
+					)
 				}
-
-				LogEvent(
-					"[MEMBERSHIP] Communicated leave: %s",
-					inc.ID,
-				)
-
-				continue
-			}
-
-			if inc.Incarnation > existing.Incarnation {
-				existing.Incarnation = inc.Incarnation
-				existing.Heartbeat = inc.Heartbeat
-				existing.Status = StatusLeft
-				existing.LocalTime = now
-
-				LogEvent(
-					"[MEMBERSHIP] Communicated leave: %s",
-					inc.ID,
-				)
-
-				continue
-			}
-
-			if inc.Incarnation == existing.Incarnation {
-				existing.Status = StatusLeft
-
-				if inc.Heartbeat > existing.Heartbeat {
-					existing.Heartbeat = inc.Heartbeat
-				}
-
-				existing.LocalTime = now
-
-				LogEvent(
-					"[MEMBERSHIP] Communicated leave: %s",
-					inc.ID,
-				)
 
 				continue
 			}
@@ -307,14 +268,11 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 
 		if !t.UseSuspicion {
 
-			// In pure Gossip mode, heartbeat determines freshness.
+			// Heartbeat determines freshness.
 			if inc.Heartbeat > existing.Heartbeat {
-
 				existing.Heartbeat = inc.Heartbeat
 				existing.LocalTime = now
 
-				// A newer ALIVE heartbeat can update an ALIVE member.
-				// We already filtered DEAD/LEFT above.
 				if inc.Status == StatusAlive {
 					existing.Status = StatusAlive
 				}
@@ -325,7 +283,6 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 
 		// 7. Gossip+S mode
 		// Incarnation is more important than heartbeat.
-
 		if inc.Incarnation > existing.Incarnation {
 
 			existing.Incarnation = inc.Incarnation
@@ -379,11 +336,10 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 				continue
 			}
 
-			// A newer heartbeat can update the member.
+			// A newer heartbeat updates an ALIVE member.
 			if inc.Heartbeat > existing.Heartbeat {
 				existing.Heartbeat = inc.Heartbeat
 
-				// A heartbeat from an ALIVE member refreshes its timer.
 				// Do not automatically turn SUSPECT back into ALIVE.
 				if existing.Status == StatusAlive &&
 					inc.Status == StatusAlive {
