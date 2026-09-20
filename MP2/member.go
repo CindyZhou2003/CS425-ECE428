@@ -102,9 +102,7 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 
 	for _, inc := range incoming {
 
-		// ============================================================
 		// 1. Handle gossip about ourselves
-		// ============================================================
 		if inc.ID == t.SelfID {
 			self, exists := t.Members[t.SelfID]
 			if !exists {
@@ -137,14 +135,12 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 			continue
 		}
 
-		// ============================================================
 		// 2. Find existing member
-		// ============================================================
+
 		existing, exists := t.Members[inc.ID]
 
-		// ============================================================
 		// 3. New member
-		// ============================================================
+
 		if !exists {
 
 			// Do not add a node that arrives already DEAD or LEFT.
@@ -185,21 +181,14 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 			continue
 		}
 
-		// ============================================================
 		// 4. DEAD / LEFT are terminal local states
-		// ============================================================
-		//
 		// Once we have already confirmed a member as DEAD or LEFT,
 		// a later ALIVE/SUSPECT message must not resurrect it.
-		if existing.Status == StatusDead ||
-			existing.Status == StatusLeft {
+		if existing.Status == StatusDead || existing.Status == StatusLeft {
 			continue
 		}
 
-		// ============================================================
 		// 5. Handle DEAD / LEFT before mode-specific merging
-		// ============================================================
-		//
 		// Both Gossip and Gossip+S need to learn about DEAD/LEFT.
 		// However, for Gossip+S, incarnation still determines whether
 		// the incoming state is newer.
@@ -314,9 +303,8 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 			continue
 		}
 
-		// ============================================================
 		// 6. Pure Gossip mode
-		// ============================================================
+
 		if !t.UseSuspicion {
 
 			// In pure Gossip mode, heartbeat determines freshness.
@@ -335,10 +323,7 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 			continue
 		}
 
-		// ============================================================
 		// 7. Gossip+S mode
-		// ============================================================
-		//
 		// Incarnation is more important than heartbeat.
 
 		if inc.Incarnation > existing.Incarnation {
@@ -367,9 +352,7 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 			continue
 		}
 
-		// ============================================================
 		// 8. Same incarnation
-		// ============================================================
 		if inc.Incarnation == existing.Incarnation {
 
 			// ALIVE -> SUSPECT is a valid transition.
