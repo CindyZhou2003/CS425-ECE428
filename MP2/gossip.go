@@ -18,7 +18,7 @@ const (
 	sweepPeriod    = 100 * time.Millisecond
 	failTimeout    = 2500 * time.Millisecond // nosuspect: silence before declaring DEAD
 	suspectTimeout = 1000 * time.Millisecond // suspect: silence before suspecting
-	confirmTimeout = 1000 * time.Millisecond // suspect: window for the node to refute
+	confirmTimeout = 1500 * time.Millisecond // suspect: window for the node to refute
 	cleanupTimeout = 4 * time.Second         // outlives stale gossip so removed nodes aren't re-added
 	bwPeriod       = time.Second
 	joinRetries    = 5
