@@ -3,33 +3,33 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net"
-	"os"
 	"os/exec"
 	"strings"
 )
 
 func runServer(args []string) {
-	if len(args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: mp1 server <port> <log file>")
-		os.Exit(1)
-	}
-	port, logFile := args[0], args[1]
+	fs := flag.NewFlagSet("server", flag.ExitOnError)
+	port := fs.Int("port", grepPort, "TCP port to serve grep on")
+	logFile := fs.String("log", defaultLogFile(), "log file to grep")
+	fs.Parse(args)
 
-	listener, err := net.Listen("tcp", ":"+port)
+	addr := fmt.Sprintf(":%d", *port)
+	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
 	}
 	defer listener.Close()
-	fmt.Printf("Server listening on port %s for file %s ...\n", port, logFile)
+	fmt.Printf("Server listening on port %d for file %s ...\n", *port, *logFile)
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			continue
 		}
-		go handleConnection(conn, logFile)
+		go handleConnection(conn, *logFile)
 	}
 }
 

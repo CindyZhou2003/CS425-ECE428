@@ -1,5 +1,9 @@
 .idea/
 .vscode/
+.DS_Store
 MP1/logs/
 MP1/mp1
 MP1/mp1-linux
+MP2/mp2
+MP2/mp2-linux
+MP2/logs/

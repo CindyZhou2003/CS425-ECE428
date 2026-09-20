@@ -17,9 +17,10 @@ const (
 	gossipFanout   = 3
 	sweepPeriod    = 100 * time.Millisecond
 	failTimeout    = 2500 * time.Millisecond // nosuspect: silence before declaring DEAD
-	suspectTimeout = 1200 * time.Millisecond // suspect: silence before suspecting
-	confirmTimeout = 1500 * time.Millisecond // suspect: window for the node to refute
+	suspectTimeout = 1000 * time.Millisecond // suspect: silence before suspecting
+	confirmTimeout = 1000 * time.Millisecond // suspect: window for the node to refute
 	cleanupTimeout = 4 * time.Second         // outlives stale gossip so removed nodes aren't re-added
+	bwPeriod       = time.Second
 	joinRetries    = 5
 	leaveRounds    = 3
 	maxPacket      = 64 * 1024
@@ -52,6 +53,10 @@ type Node struct {
 
 	versionMu sync.Mutex
 	version   uint64
+
+	// Wire bytes since the last [BW] line, for the bandwidth measurement
+	bytesSent atomic.Uint64
+	bytesRecv atomic.Uint64
 }
 
 func NewNode(port int, introducer string, suspicion bool) (*Node, error) {
@@ -98,6 +103,7 @@ func (n *Node) Join() {
 	go n.receiveLoop()
 	go n.gossipLoop()
 	go n.sweepLoop()
+	go n.bandwidthLoop()
 	if !n.isIntroducer {
 		go n.requestJoin()
 	}
@@ -158,6 +164,20 @@ func (n *Node) gossipLoop() {
 	}
 }
 
+// Reports the bytes this node put on and took off the wire each period
+func (n *Node) bandwidthLoop() {
+	ticker := time.NewTicker(bwPeriod)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-n.done:
+			return
+		case <-ticker.C:
+			LogEvent("[BW] sent=%d recv=%d bytes over %v", n.bytesSent.Swap(0), n.bytesRecv.Swap(0), bwPeriod)
+		}
+	}
+}
+
 func (n *Node) receiveLoop() {
 	buf := make([]byte, maxPacket)
 	for {
@@ -165,6 +185,7 @@ func (n *Node) receiveLoop() {
 		if err != nil {
 			return // conn closed by Leave
 		}
+		n.bytesRecv.Add(uint64(size))
 		if rand.Float64() < DropRate() {
 			LogEvent("[DROP] Dropped %d-byte message from %s", size, src)
 			continue
@@ -281,5 +302,7 @@ func (n *Node) send(addr string, payload []byte) {
 	if err != nil {
 		return
 	}
-	n.conn.WriteToUDP(payload, udp)
+	if _, err := n.conn.WriteToUDP(payload, udp); err == nil {
+		n.bytesSent.Add(uint64(len(payload)))
+	}
 }

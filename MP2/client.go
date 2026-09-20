@@ -14,28 +14,6 @@ import (
 	"time"
 )
 
-// one host:port per line
-const hostsFile = "host.txt"
-
-// Skips blank lines and # comments
-func loadServers() ([]string, error) {
-	data, err := os.ReadFile(hostsFile)
-	if err != nil {
-		return nil, err
-	}
-	var servers []string
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line != "" && !strings.HasPrefix(line, "#") {
-			servers = append(servers, line)
-		}
-	}
-	if len(servers) == 0 {
-		return nil, fmt.Errorf("%s lists no hosts", hostsFile)
-	}
-	return servers, nil
-}
-
 type nodeResult struct {
 	addr    string
 	logFile string
@@ -46,15 +24,11 @@ type nodeResult struct {
 
 func runClient(args []string) {
 	if len(args) < 1 {
-		fmt.Println("Usage: mp1 client [grep options...] <pattern>")
+		fmt.Println("usage: mp2 client [grep options...] <pattern>")
 		return
 	}
 
-	serverList, err := loadServers()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: reading VM list: %v\n", err)
-		os.Exit(1)
-	}
+	serverList := grepServers()
 	fmt.Printf("--- Querying grep %q across %d nodes ---\n\n", args, len(serverList))
 
 	results := queryAll(serverList, args)
