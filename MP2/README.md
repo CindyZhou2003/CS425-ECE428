@@ -80,6 +80,7 @@ export NETID=your_netid
 NODE_FLAGS="-drop 5" ./vm.sh run # start all VMs with 5% drop rate with Gossip+S
 NODE_FLAGS="-nosuspect -drop 5" ./vm.sh run # with pure Gossip(another run)
 sleep 2000 # wait for 2000s
+./vm.sh kill # kill all VMs
 ./vm.sh fetch  # save VM logs into ./logs
 ./analyze.py logs  # analyze bandwidth, false positive rate, detection times
 mv logs logs-fp-suspect-05 # rename and save logs
