@@ -76,10 +76,10 @@ turns a directory of logs into the three metrics.
 ``` bash
 export NETID=your_netid
 ./vm.sh clear  # clear logs before each run
-sleep 1000 # wait for 1000s
 # drop rate = 0,1,5,10,20%
 NODE_FLAGS="-drop 5" ./vm.sh run # start all VMs with 5% drop rate with Gossip+S
 NODE_FLAGS="-nosuspect -drop 5" ./vm.sh run # with pure Gossip(another run)
+sleep 2000 # wait for 2000s
 ./vm.sh fetch  # save VM logs into ./logs
 ./analyze.py logs  # analyze bandwidth, false positive rate, detection times
 mv logs logs-fp-suspect-05 # rename and save logs
