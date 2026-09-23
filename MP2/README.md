@@ -11,22 +11,17 @@ GOOS=linux GOARCH=amd64 go build -o mp2-linux .  # for the VMs
 
 ## Deploy and connect
 ``` bash
-export NETID=your_netid
+export NETID=your_netid # enter you net id
+# upload binary to VMs
 for i in $(seq -w 1 10); do
   scp mp2-linux $NETID@fa26-cs425-23$i.cs.illinois.edu:~/
 done
-
 ssh $NETID@fa26-cs425-2301.cs.illinois.edu   # VM 1 = introducer, start it first
 ./mp2-linux node
 
 ssh $NETID@fa26-cs425-2302.cs.illinois.edu   # VM i
 ./mp2-linux node
 ```
-This starts an interactive process on the VM. No arguments are needed: the cluster, the
-ports and VM 1 as introducer are compiled in ([main.go](main.go)), and the log file defaults
-to `machine.<i>.log` with `<i>` read off the VM hostname. `-nosuspect` starts as plain
-Gossip, `-drop 5` starts with a 5% receiver drop rate, `-daemon` runs without the prompt
-(`./mp2 node -h` lists the rest, which only matter off the cluster).
 
 ## Commands
 Type them at the `>` prompt.
@@ -58,9 +53,7 @@ ssh-copy-id $NETID@fa26-cs425-2301.cs.illinois.edu   # once per VM
 ./vm.sh run 3           # start the node on VM 3 (no VM numbers = all 10)
 ./vm.sh kill 3 4 5      # SIGKILL those nodes in parallel, for failure detection
 ./vm.sh fetch           # copy the VM logs into ./logs
-./vm.sh clear           # truncate them before a measurement run
-
-NODE_FLAGS="-nosuspect -drop 5" ./vm.sh run   # extra node flags
+./vm.sh clear           # truncate all nodes
 ```
 `run` starts the node with `-daemon`, so it gossips but has no prompt: ssh in and run it by
 hand on the VMs where you need to type commands. `kill` stamps a `[KILL]` line into each
@@ -82,11 +75,15 @@ a second, and `./vm.sh kill` writes `[KILL]` at the instant it kills a node. `an
 turns a directory of logs into the three metrics.
 ``` bash
 export NETID=your_netid
-./vm.sh clear                           # before each run
-./vm.sh run                             # NODE_FLAGS=... for Gossip / drop rate
-# ... let it run, kill nodes, etc.
-./vm.sh fetch                           # into ./logs
-./analyze.py logs                       # bandwidth, false positive rate, detection times
+./vm.sh clear  # clear logs before each run
+sleep 1000 # wait for 1000s
+# drop rate = 0,1,5,10,20%
+NODE_FLAGS="-drop 5" ./vm.sh run # start all VMs with 5% drop rate with Gossip+S
+NODE_FLAGS="-nosuspect -drop 5" ./vm.sh run # with pure Gossip(another run)
+./vm.sh fetch  # save VM logs into ./logs
+./analyze.py logs  # analyze bandwidth, false positive rate, detection times
+mv logs logs-fp-suspect-05 # rename and save logs
+
 ./analyze.py logs --since 14:05:00 --until 14:10:00   # one trial out of a longer run
 ```
 Run each experiment twice, with `NODE_FLAGS="-nosuspect"` for Gossip and without it for

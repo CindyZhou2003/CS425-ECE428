@@ -67,12 +67,14 @@ kill_vm() {
 }
 
 # Start the node on VM $1 in the background; -daemon since it has no terminal to read
+# The binary goes through $bin so this shell's own command line can't match NODE_PAT
 start_vm() {
 	local n="$1" out
 	if ! out=$(remote "$n" "
 		pids=\$(pgrep -u \$(id -un) -f '$NODE_PAT')
 		if [ -n \"\$pids\" ]; then echo RUNNING \$pids; exit 0; fi
-		nohup ~/$BINARY node -daemon ${NODE_FLAGS:-} > ~/node.out 2>&1 </dev/null &
+		bin=~/$BINARY
+		nohup \"\$bin\" node -daemon ${NODE_FLAGS:-} > ~/node.out 2>&1 </dev/null &
 		pid=\$!
 		sleep 1
 		if kill -0 \$pid 2>/dev/null; then echo STARTED \$pid; else echo DIED; head -5 ~/node.out; fi

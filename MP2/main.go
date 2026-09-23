@@ -17,6 +17,7 @@ const (
 	grepPort   = 8001
 )
 
+// The introducer is always VM 1
 func introducerAddr() string { return fmt.Sprintf(vmHostFmt+":%d", 1, gossipPort) }
 
 // Every VM's grep server, for the MP1 client to fan out to
