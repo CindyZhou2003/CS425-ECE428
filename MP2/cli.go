@@ -58,7 +58,7 @@ func runNode(args []string) {
 	c := &cli{port: *port, introducer: *introducer, suspicion: !*nosuspect, daemon: *daemon}
 	SetDropRate(*drop / 100)
 	if *drop > 0 {
-		LogEvent("[DROP] Receiver drop rate set to %.1f%%", *drop)
+		LogEvent("[PROTOCOL] Receiver drop rate set to %.1f%%", *drop)
 	}
 
 	c.join()
@@ -231,8 +231,13 @@ func (c *cli) setDropRate(args []string) {
 		fmt.Println("drop rate must be a percentage between 0 and 100")
 		return
 	}
-	SetDropRate(pct / 100)
-	LogEvent("[DROP] Receiver drop rate set to %.1f%%", pct)
+	if c.node == nil {
+		SetDropRate(pct / 100)
+		LogEvent("[PROTOCOL] Receiver drop rate set to %.1f%%", pct)
+		return
+	}
+	c.node.SetDropRate(pct / 100)
+	fmt.Printf("drop rate %.1f%% on this node, spreading to the group\n", pct)
 }
 
 func onOff(suspicion bool) string {

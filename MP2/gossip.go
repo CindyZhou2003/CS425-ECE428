@@ -30,6 +30,7 @@ type message struct {
 	Join      bool          `json:"join"`
 	Members   []MemberEntry `json:"members"`
 	Suspicion bool          `json:"suspicion"`
+	Drop      float64       `json:"drop"`
 	Version   uint64        `json:"version"`
 }
 
@@ -196,8 +197,8 @@ func (n *Node) receiveLoop() {
 			continue
 		}
 
-		// Mode first, so the merge below follows the group's current protocol
-		n.adoptMode(msg)
+		// Config first, so the merge below follows the group's current protocol
+		n.adoptConfig(msg)
 		n.Table.MergeMemberList(msg.Members)
 
 		if msg.Join && n.isIntroducer {
@@ -258,6 +259,15 @@ func (t *MembershipTable) sweep(now time.Time) {
 }
 
 // Bumps the mode version so the switch spreads through gossip instead of staying local
+// Spreads the receiver drop rate to the whole group, like a mode switch
+func (n *Node) SetDropRate(r float64) {
+	n.versionMu.Lock()
+	defer n.versionMu.Unlock()
+	n.version++
+	SetDropRate(r)
+	LogEvent("[PROTOCOL] Receiver drop rate set to %.1f%% (version %d)", r*100, n.version)
+}
+
 func (n *Node) SwitchMode(suspicion bool) {
 	n.versionMu.Lock()
 	defer n.versionMu.Unlock()
@@ -267,7 +277,8 @@ func (n *Node) SwitchMode(suspicion bool) {
 }
 
 // Newer version wins; on a tie from concurrent switches, suspect wins so the group still converges
-func (n *Node) adoptMode(msg message) {
+// Takes the group's protocol mode and drop rate from newer gossip
+func (n *Node) adoptConfig(msg message) {
 	n.versionMu.Lock()
 	defer n.versionMu.Unlock()
 	cur := n.Table.IsSuspicionEnabled()
@@ -278,6 +289,10 @@ func (n *Node) adoptMode(msg message) {
 	if msg.Suspicion != cur {
 		n.Table.SetSuspicionMode(msg.Suspicion)
 		LogEvent("[PROTOCOL] Adopted %s from gossip (version %d)", isSuspect(msg.Suspicion), msg.Version)
+	}
+	if msg.Drop != DropRate() {
+		SetDropRate(msg.Drop)
+		LogEvent("[PROTOCOL] Adopted receiver drop rate %.1f%% from gossip (version %d)", msg.Drop*100, msg.Version)
 	}
 }
 
@@ -290,7 +305,7 @@ func isSuspect(suspicion bool) string {
 
 func (n *Node) encode(join bool, members []MemberEntry) []byte {
 	n.versionMu.Lock()
-	msg := message{Join: join, Members: members, Suspicion: n.Table.IsSuspicionEnabled(), Version: n.version}
+	msg := message{Join: join, Members: members, Suspicion: n.Table.IsSuspicionEnabled(), Drop: DropRate(), Version: n.version}
 	n.versionMu.Unlock()
 	payload, _ := json.Marshal(msg) // plain structs, can't fail
 	return payload

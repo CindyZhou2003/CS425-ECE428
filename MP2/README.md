@@ -35,7 +35,7 @@ display_suspects # every node suspected since launch, with the time; after switc
 switch suspect # enable suspicion (Gossip+S), spreads to the group by gossip
 switch nosuspect # disable it; membership list is kept, no restart needed
 display_protocol  # -> protocol: Gossip+S (suspicion enabled);after switch nosuspect -> protocol: Gossip (suspicion disabled)
-set_drop_rate 30 # drop 30% of INCOMING messages; each drop is logged as [DROP]
+set_drop_rate 30 # drop 30% of INCOMING messages group-wide, spreads by gossip like switch; each drop is logged as [DROP]
 set_drop_rate 0 # back to no loss (the default)
 
 help  # reprint this list
@@ -86,8 +86,6 @@ mv logs logs-fp-suspect-05 # rename and save logs
 
 ./analyze.py logs --since 14:05:00 --until 14:10:00   # one trial out of a longer run
 ```
-Run each experiment twice, with `NODE_FLAGS="-nosuspect"` for Gossip and without it for
-Gossip+S.
 
 1. **Bandwidth vs group size**: no failures, N = 2, 4, 6, 8, 10 (`./vm.sh run 1 2 3 4`),
    ~60s each. Read `per node: mean ... B/s`, skipping the first ~10s of join traffic
