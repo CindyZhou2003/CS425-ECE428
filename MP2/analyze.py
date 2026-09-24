@@ -18,6 +18,10 @@ LINE = re.compile(r"^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{3}) (\[[A-Z]+\]) (.*)$"
 BW = re.compile(r"sent=(\d+) recv=(\d+)")
 JOINED = re.compile(r"Joined as (\S+)")
 TS = "%Y-%m-%d %H:%M:%S.%f"
+# Kills closer than this belong to one simultaneous failure set
+KILL_GAP = 2
+# Ignores [FAILURE] lines this long after a kill, which belong to a later trial
+DETECT_WINDOW = 15
 
 
 def parse(path):
@@ -83,31 +87,58 @@ def false_positives(logs):
 
 def detection(logs):
     print("== detection time ==")
+    # Groups the kills of one ./vm.sh kill call, whose victims die within a second of each other
+    kills = sorted((e[0], vm) for vm, events in logs.items() for e in events if e[1] == "[KILL]")
+    sets = []
+    for ts, vm in kills:
+        if sets and (ts - sets[-1][-1][0]).total_seconds() < KILL_GAP:
+            sets[-1].append((ts, vm))
+        else:
+            sets.append([(ts, vm)])
+
     all_times = []
-    for vm, events in logs.items():
-        for kill_ts, _, _ in [e for e in events if e[1] == "[KILL]"]:
+    by_k = {}
+    for group in sets:
+        victims = {vm for _, vm in group}
+        survivors = [vm for vm in logs if vm not in victims]
+        firsts, lasts = [], []
+        for kill_ts, vm in group:
             # The victim's ID is whatever it last joined as before being killed
-            ids = [JOINED.search(e[2]).group(1) for e in events if e[1] == "[MEMBERSHIP]" and JOINED.search(e[2]) and e[0] <= kill_ts]
+            ids = [JOINED.search(e[2]).group(1) for e in logs[vm] if e[1] == "[MEMBERSHIP]" and JOINED.search(e[2]) and e[0] <= kill_ts]
             if not ids:
                 print(f"  VM {vm}: killed at {kill_ts:%H:%M:%S.%f} but never logged a join")
                 continue
             victim = ids[-1]
             times = []
-            for other, oevents in logs.items():
-                if other == vm:
-                    continue
-                hit = next((e[0] for e in oevents if e[1] == "[FAILURE]" and victim in e[2] and e[0] >= kill_ts), None)
+            for other in survivors:
+                hit = next((e[0] for e in logs[other] if e[1] == "[FAILURE]" and victim in e[2]
+                            and kill_ts <= e[0] <= kill_ts + timedelta(seconds=DETECT_WINDOW)), None)
                 if hit:
                     times.append((hit - kill_ts).total_seconds())
+            if len(times) < len(survivors):
+                print(f"  VM {vm} killed at {kill_ts:%H:%M:%S.%f}: only {len(times)}/{len(survivors)} survivors detected it")
             if not times:
-                print(f"  VM {vm} killed at {kill_ts:%H:%M:%S.%f}: no detection found")
                 continue
             all_times += times
-            print(f"  VM {vm} killed at {kill_ts:%H:%M:%S.%f}: {len(times)} detectors, "
+            firsts.append(min(times))
+            lasts.append(max(times))
+            print(f"  k={len(group)} VM {vm} killed at {kill_ts:%H:%M:%S.%f}: {len(times)} detectors, "
                   f"first {min(times):.3f}s, mean {mean(times):.3f}s, last {max(times):.3f}s")
+        if firsts:
+            # One sample per trial: mean time to first detection, and time until everyone knows everything
+            by_k.setdefault(len(group), []).append((mean(firsts), max(lasts)))
     if all_times:
         print(f"  overall: mean {mean(all_times):.3f}s, stdev {pstdev(all_times):.3f}s, "
               f"max {max(all_times):.3f}s, n={len(all_times)}")
+
+    if by_k:
+        print("\n== detection time vs simultaneous failures ==")
+        print("  k  trials  first-detect mean/stdev   all-detected mean/stdev   worst")
+        for k in sorted(by_k):
+            first = [f for f, _ in by_k[k]]
+            last = [l for _, l in by_k[k]]
+            print(f"  {k}  {len(by_k[k]):6}  {mean(first):8.3f}s / {pstdev(first):.3f}s"
+                  f"      {mean(last):8.3f}s / {pstdev(last):.3f}s     {max(last):.3f}s")
 
 
 def main():
@@ -132,8 +163,10 @@ def main():
     bandwidth(logs)
     print()
     false_positives(logs)
-    print()
-    detection(logs)
+    # Detection needs kills; no-failure runs have none
+    if any(e[1] == "[KILL]" for events in logs.values() for e in events):
+        print()
+        detection(logs)
 
 
 main()

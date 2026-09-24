@@ -192,6 +192,10 @@ func (t *MembershipTable) MergeMemberList(incoming []MemberEntry) {
 
 			if !t.UseSuspicion {
 				// Pure Gossip: heartbeat determines freshness.
+				// Ignores a claim older than what we hold, or one false positive re-kills a re-added member
+				if inc.Heartbeat < existing.Heartbeat {
+					continue
+				}
 				existing.Status = inc.Status
 				existing.LocalTime = now
 

@@ -14,7 +14,7 @@ import (
 // Protocol timing, sized so suspicion plus confirmation lands under the 3s first-detection bound
 const (
 	gossipPeriod   = 250 * time.Millisecond
-	gossipFanout   = 3
+	gossipFanout   = 2 // enough redundancy for the bounds, little enough that drops show up as false positives
 	sweepPeriod    = 100 * time.Millisecond
 	failTimeout    = 2500 * time.Millisecond // nosuspect: silence before declaring DEAD
 	suspectTimeout = 1000 * time.Millisecond // suspect: silence before suspecting

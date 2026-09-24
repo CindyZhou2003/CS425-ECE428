@@ -1,0 +1,149 @@
+Droprate=5%
+suspect
+
+== bandwidth ==
+  VM 1     15646.7 B/s over 1753s
+  VM 10    15768.6 B/s over 1745s
+  VM 2     15877.6 B/s over 1753s
+  VM 3     15812.8 B/s over 1751s
+  VM 4     15939.3 B/s over 1750s
+  VM 5     15848.0 B/s over 1749s
+  VM 6     15850.0 B/s over 1749s
+  VM 7     15873.8 B/s over 1747s
+  VM 8     15843.7 B/s over 1747s
+  VM 9     15862.3 B/s over 1746s
+  per node: mean 15832.3 B/s, group 158322.8 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 1754s over 10 nodes
+  suspicions 6689  -> 3.8136/s group, 0.3814/s per node
+  failures   17  -> 0.0097/s group, 0.0010/s per node
+
+Droprate=10%
+suspect
+
+== bandwidth ==
+  VM 1     15709.0 B/s over 1369s
+  VM 10    15813.7 B/s over 1357s
+  VM 2     15691.1 B/s over 1367s
+  VM 3     15803.6 B/s over 1365s
+  VM 4     15774.8 B/s over 1364s
+  VM 5     15803.7 B/s over 1363s
+  VM 6     15874.1 B/s over 1361s
+  VM 7     15942.5 B/s over 1361s
+  VM 8     15806.9 B/s over 1359s
+  VM 9     15787.9 B/s over 1358s
+  per node: mean 15800.7 B/s, group 158007.3 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 1370s over 10 nodes
+  suspicions 7857  -> 5.7350/s group, 0.5735/s per node
+  failures   20  -> 0.0146/s group, 0.0015/s per node
+
+
+Droprate=20%
+suspect
+(base) amazinguknow@vpnmfapool-10-251-160-108 MP2 % ./analyze.py logs                
+10 logs from logs
+
+== bandwidth ==
+  VM 1     15277.0 B/s over 664s
+  VM 10    15616.9 B/s over 655s
+  VM 2     15324.8 B/s over 663s
+  VM 3     15231.2 B/s over 662s
+  VM 4     15312.3 B/s over 661s
+  VM 5     11436.3 B/s over 660s
+  VM 6     15167.5 B/s over 659s
+  VM 7     15496.0 B/s over 658s
+  VM 8     15494.4 B/s over 656s
+  VM 9     15415.4 B/s over 656s
+  per node: mean 14977.2 B/s, group 149771.7 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 665s over 10 nodes
+  suspicions 7698  -> 11.5736/s group, 1.1574/s per node
+  failures   70  -> 0.1052/s group, 0.0105/s per node
+
+  
+Droprate=30%
+suspect
+
+== bandwidth ==
+  VM 1     15070.5 B/s over 413s
+  VM 10    15407.5 B/s over 398s
+  VM 2     10891.9 B/s over 411s
+  VM 3     15255.6 B/s over 409s
+  VM 4     15289.2 B/s over 408s
+  VM 5     15202.3 B/s over 407s
+  VM 6     15177.7 B/s over 405s
+  VM 7     15431.4 B/s over 403s
+  VM 8     15152.0 B/s over 402s
+  VM 9     15438.8 B/s over 400s
+  per node: mean 14831.7 B/s, group 148316.9 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 414s over 10 nodes
+  suspicions 7748  -> 18.7148/s group, 1.8715/s per node
+  failures   156  -> 0.3768/s group, 0.0377/s per node
+
+
+(base) amazinguknow@vpnmfapool-10-251-160-108 MP2 % ./analyze.py logs-detect-suspect 
+10 logs from logs-detect-suspect
+
+== bandwidth ==
+  VM 1     14226.5 B/s over 609s
+  VM 10    12905.0 B/s over 592s
+  VM 2     12795.6 B/s over 607s
+  VM 3     12512.4 B/s over 606s
+  VM 4     12671.6 B/s over 605s
+  VM 5     13162.3 B/s over 603s
+  VM 6     13069.5 B/s over 601s
+  VM 7     12987.2 B/s over 599s
+  VM 8     13251.6 B/s over 596s
+  VM 9     13258.5 B/s over 594s
+  per node: mean 13084.0 B/s, group 130840.2 B/s, n=10
+
+== false positives (no-failure run) ==
+  warning: these logs contain [KILL], detections may be real failures
+  window 610s over 10 nodes
+  suspicions 1411  -> 2.3131/s group, 0.2313/s per node
+  failures   231  -> 0.3787/s group, 0.0379/s per node
+
+== detection time ==
+  k=1 VM 2 killed at 22:06:32.400000: 9 detectors, first 2.387s, mean 2.480s, last 2.634s
+  k=1 VM 3 killed at 22:07:06.534000: 9 detectors, first 2.519s, mean 2.582s, last 2.662s
+  k=1 VM 4 killed at 22:07:40.204000: 9 detectors, first 2.084s, mean 2.258s, last 2.579s
+  k=1 VM 5 killed at 22:08:14.183000: 9 detectors, first 2.449s, mean 2.593s, last 2.632s
+  k=1 VM 6 killed at 22:08:48.301000: 9 detectors, first 2.351s, mean 2.470s, last 2.561s
+  k=2 VM 8 killed at 22:09:22.386000: 8 detectors, first 2.666s, mean 2.771s, last 2.914s
+  k=2 VM 7 killed at 22:09:22.413000: 8 detectors, first 2.382s, mean 2.426s, last 2.621s
+  k=2 VM 10 killed at 22:09:58.852000: 8 detectors, first 2.348s, mean 2.507s, last 2.680s
+  k=2 VM 9 killed at 22:09:58.860000: 8 detectors, first 2.440s, mean 2.472s, last 2.591s
+  k=2 VM 3 killed at 22:10:36.732000: 8 detectors, first 2.319s, mean 2.405s, last 2.564s
+  k=2 VM 2 killed at 22:10:36.735000: 8 detectors, first 2.432s, mean 2.489s, last 2.564s
+  k=2 VM 5 killed at 22:11:16.248000: 8 detectors, first 2.352s, mean 2.458s, last 2.718s
+  k=2 VM 4 killed at 22:11:16.879000: 8 detectors, first 2.616s, mean 2.708s, last 2.838s
+  k=2 VM 7 killed at 22:11:54.151000: 8 detectors, first 2.583s, mean 2.708s, last 2.914s
+  k=2 VM 6 killed at 22:11:55.130000: 8 detectors, first 2.435s, mean 2.523s, last 2.636s
+  k=3 VM 8 killed at 22:12:32.044000: 7 detectors, first 2.519s, mean 2.535s, last 2.590s
+  k=3 VM 10 killed at 22:12:32.857000: 7 detectors, first 2.506s, mean 2.660s, last 2.790s
+  k=3 VM 9 killed at 22:12:32.873000: 7 detectors, first 2.373s, mean 2.462s, last 2.638s
+  k=3 VM 3 killed at 22:13:13.114000: 7 detectors, first 2.451s, mean 2.603s, last 2.719s
+  k=3 VM 2 killed at 22:13:13.116000: 7 detectors, first 1.973s, mean 2.197s, last 2.330s
+  k=3 VM 4 killed at 22:13:13.181000: 7 detectors, first 2.384s, mean 2.554s, last 2.652s
+  k=3 VM 7 killed at 22:13:53.704000: 7 detectors, first 2.585s, mean 2.741s, last 2.898s
+  k=3 VM 5 killed at 22:13:53.835000: 7 detectors, first 2.453s, mean 2.610s, last 2.768s
+  k=3 VM 6 killed at 22:13:54.164000: 7 detectors, first 2.538s, mean 2.701s, last 3.039s
+  k=3 VM 8 killed at 22:14:33.477000: 7 detectors, first 2.382s, mean 2.439s, last 2.525s
+  k=3 VM 10 killed at 22:14:34.082000: 7 detectors, first 1.793s, mean 2.056s, last 2.226s
+  k=3 VM 9 killed at 22:14:34.086000: 7 detectors, first 1.780s, mean 1.891s, last 1.972s
+  k=3 VM 2 killed at 22:15:14.214000: 7 detectors, first 2.244s, mean 2.359s, last 2.495s
+  k=3 VM 4 killed at 22:15:14.217000: 7 detectors, first 2.378s, mean 2.491s, last 2.591s
+  k=3 VM 3 killed at 22:15:14.228000: 7 detectors, first 2.538s, mean 2.653s, last 2.732s
+  overall: mean 2.495s, stdev 0.209s, max 3.039s, n=230
+
+== detection time vs simultaneous failures ==
+  k  trials  first-detect mean/stdev   all-detected mean/stdev   worst
+  1       5     2.358s / 0.148s         2.614s / 0.038s     2.662s
+  2       5     2.457s / 0.061s         2.782s / 0.139s     2.914s
+  3       5     2.326s / 0.191s         2.761s / 0.165s     3.039s

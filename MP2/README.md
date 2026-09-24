@@ -5,7 +5,7 @@ One daemon per VM keeps a full membership list and gossips it over UDP.
 ## Build
 ``` bash
 cd MP2
-go build -o mp2 .                                # local
+go build -o mp2 .  # local
 GOOS=linux GOARCH=amd64 go build -o mp2-linux .  # for the VMs
 ```
 
@@ -77,13 +77,13 @@ turns a directory of logs into the three metrics.
 export NETID=your_netid
 ./vm.sh kill # kill all VMs
 ./vm.sh clear  # clear logs before each run
-# drop rate = 0,1,5,10,20%
+# drop rate = 0,5,10,20,30%
 NODE_FLAGS="-drop 5" ./vm.sh run # start all VMs with 5% drop rate with Gossip+S
 NODE_FLAGS="-nosuspect -drop 5" ./vm.sh run # with pure Gossip(another run)
 sleep 2000 # wait for 2000s
 ./vm.sh fetch  # save VM logs into ./logs
 ./analyze.py logs  # analyze bandwidth, false positive rate, detection times
-mv logs logs-fp-suspect-05 # rename and save logs
+mv logs logs-fp-suspect-30 # rename and save log dir
 ./analyze.py logs --since 14:05:00 --until 14:10:00   # one trial out of a longer run
 ```
 
@@ -91,12 +91,22 @@ mv logs logs-fp-suspect-05 # rename and save logs
    ~60s each. Read `per node: mean ... B/s`, skipping the first ~10s of join traffic
    with `--since`.
 2. **False positives vs drop rate**: N = 10, no kills, `NODE_FLAGS="-drop $D"` for
-   D = 0, 1, 5, 10, 20, 30, **at least 5 minutes each**. Read `failures ... /s group`;
+   D = 0, 5, 10, 20, 30, 40, 50, **30 minutes each**. Pure Gossip stays at zero below ~30%, so
+   report those as an upper bound (0 in T seconds -> under 3/T per second, 95%). Read `failures ... /s group`;
    under Gossip+S also report `suspicions`, since the ones that got `[REFUTE]`d never
    became false positives.
-3. **Detection time vs simultaneous failures**: N = 10, `./vm.sh kill 3 4 5` for 1, 2, 3, 4
-   victims, 5 trials each. `analyze.py` reports first/mean/last per `[KILL]`. Never kill
-   VM 1: nothing can rejoin once the introducer is gone.
+3. **Detection time vs simultaneous failures**: N = 10, 1-3 victims killed at once, 5 trials
+   each, restarting victims between trials. `measure_detection.sh` runs it all (~10 min per mode):
+``` bash
+   ./measure_detection.sh gossip  # -> logs-detect-gossip
+   ./analyze.py logs-detect-gossip  # table: k, first-detect, all-detected, worst
+
+   ./measure_detection.sh suspect # -> logs-detect-suspect
+   ./analyze.py logs-detect-suspect  
+   ```
+   first-detect is when some survivor first marks a victim failed (3s bound); all-detected is
+   when every survivor has marked every victim (6s bound). Never kill VM 1: nothing can
+   rejoin once the introducer is gone.
 
 Spot-check a run across the VMs with MP1 grep instead of pulling the logs:
 ``` bash
