@@ -147,3 +147,96 @@ suspect
   1       5     2.358s / 0.148s         2.614s / 0.038s     2.662s
   2       5     2.457s / 0.061s         2.782s / 0.139s     2.914s
   3       5     2.326s / 0.191s         2.761s / 0.165s     3.039s
+
+
+== bandwidth ==
+  VM 1     10125.9 B/s over 592s
+  VM 10     9422.0 B/s over 580s
+  VM 2      9210.5 B/s over 591s
+  VM 3      9954.7 B/s over 589s
+  VM 4     10148.0 B/s over 588s
+  VM 5     11008.3 B/s over 587s
+  VM 6     10560.4 B/s over 585s
+  VM 7     10412.2 B/s over 583s
+  VM 8      9816.0 B/s over 582s
+  VM 9      9694.1 B/s over 581s
+  per node: mean 10035.2 B/s, group 100352.1 B/s, n=10
+
+== false positives (no-failure run) ==
+  warning: these logs contain [KILL], detections may be real failures
+  window 593s over 10 nodes
+  suspicions 0  -> 0.0000/s group, 0.0000/s per node
+  failures   274  -> 0.4621/s group, 0.0462/s per node
+
+== detection time ==
+  k=1 VM 2 killed at 16:41:13.697000: 9 detectors, first 0.920s, mean 0.995s, last 1.089s
+  VM 3 killed at 16:41:47.097000: only 7/9 survivors detected it
+  k=1 VM 3 killed at 16:41:47.097000: 7 detectors, first 0.871s, mean 0.947s, last 1.134s
+  VM 4 killed at 16:42:20.936000: only 6/9 survivors detected it
+  k=1 VM 4 killed at 16:42:20.936000: 6 detectors, first 0.896s, mean 0.979s, last 1.091s
+  VM 5 killed at 16:42:55.065000: only 5/9 survivors detected it
+  k=1 VM 5 killed at 16:42:55.065000: 5 detectors, first 0.871s, mean 0.932s, last 0.972s
+  VM 6 killed at 16:43:28.965000: only 4/9 survivors detected it
+  k=1 VM 6 killed at 16:43:28.965000: 4 detectors, first 0.867s, mean 0.946s, last 1.062s
+  VM 8 killed at 16:44:03.008000: only 2/8 survivors detected it
+  k=2 VM 8 killed at 16:44:03.008000: 2 detectors, first 0.800s, mean 0.875s, last 0.951s
+  VM 7 killed at 16:44:03.407000: only 2/8 survivors detected it
+  k=2 VM 7 killed at 16:44:03.407000: 2 detectors, first 0.901s, mean 0.913s, last 0.925s
+  VM 9 killed at 16:44:40.650000: only 0/8 survivors detected it
+  VM 10 killed at 16:44:40.697000: only 0/8 survivors detected it
+  VM 3 killed at 16:45:18.119000: only 5/8 survivors detected it
+  k=2 VM 3 killed at 16:45:18.119000: 5 detectors, first 0.877s, mean 0.942s, last 0.979s
+  VM 2 killed at 16:45:18.127000: only 5/8 survivors detected it
+  k=2 VM 2 killed at 16:45:18.127000: 5 detectors, first 0.869s, mean 0.934s, last 0.971s
+  VM 5 killed at 16:45:54.220000: only 3/8 survivors detected it
+  k=2 VM 5 killed at 16:45:54.220000: 3 detectors, first 0.946s, mean 0.997s, last 1.072s
+  VM 4 killed at 16:45:55.070000: only 3/8 survivors detected it
+  k=2 VM 4 killed at 16:45:55.070000: 3 detectors, first 1.022s, mean 1.155s, last 1.222s
+  VM 7 killed at 16:46:31.640000: only 1/8 survivors detected it
+  k=2 VM 7 killed at 16:46:31.640000: 1 detectors, first 0.979s, mean 0.979s, last 0.979s
+  VM 6 killed at 16:46:32.054000: only 1/8 survivors detected it
+  k=2 VM 6 killed at 16:46:32.054000: 1 detectors, first 0.964s, mean 0.964s, last 0.964s
+  VM 8 killed at 16:47:08.785000: only 0/7 survivors detected it
+  k=3 VM 9 killed at 16:47:09.147000: 7 detectors, first 1.009s, mean 1.152s, last 1.249s
+  k=3 VM 10 killed at 16:47:09.178000: 7 detectors, first 0.928s, mean 1.014s, last 1.125s
+  k=3 VM 3 killed at 16:47:48.337000: 7 detectors, first 0.981s, mean 1.082s, last 1.168s
+  k=3 VM 2 killed at 16:47:48.347000: 7 detectors, first 0.865s, mean 0.953s, last 1.066s
+  k=3 VM 4 killed at 16:47:48.791000: 7 detectors, first 0.621s, mean 1.012s, last 1.327s
+  k=3 VM 5 killed at 16:48:27.511000: 7 detectors, first 0.908s, mean 1.052s, last 1.198s
+  k=3 VM 7 killed at 16:48:27.751000: 7 detectors, first 0.825s, mean 0.893s, last 0.991s
+  k=3 VM 6 killed at 16:48:27.915000: 7 detectors, first 0.938s, mean 1.096s, last 1.175s
+  k=3 VM 8 killed at 16:49:07.176000: 7 detectors, first 1.000s, mean 1.207s, last 1.377s
+  k=3 VM 10 killed at 16:49:07.190000: 7 detectors, first 0.562s, mean 0.983s, last 1.346s
+  k=3 VM 9 killed at 16:49:07.192000: 7 detectors, first 0.884s, mean 1.008s, last 1.214s
+  VM 2 killed at 16:49:46.567000: only 6/7 survivors detected it
+  k=3 VM 2 killed at 16:49:46.567000: 6 detectors, first 1.107s, mean 1.264s, last 1.339s
+  k=3 VM 3 killed at 16:49:46.571000: 7 detectors, first 0.788s, mean 1.064s, last 1.254s
+  k=3 VM 4 killed at 16:49:46.892000: 7 detectors, first 0.944s, mean 1.042s, last 1.244s
+  overall: mean 1.025s, stdev 0.138s, max 1.377s, n=150
+
+== detection time vs simultaneous failures ==
+  k  trials  first-detect mean/stdev   all-detected mean/stdev   worst
+  1       5     0.885s / 0.020s         1.070s / 0.054s     1.134s
+  2       4     0.920s / 0.059s         1.033s / 0.110s     1.222s
+  3       5     0.889s / 0.062s         1.298s / 0.065s     1.377s
+
+Droprate=30%
+nonsuspect
+
+== bandwidth ==
+  VM 1      2870.1 B/s over 176s
+  VM 10     2645.2 B/s over 161s
+  VM 2      2947.5 B/s over 174s
+  VM 3      1142.2 B/s over 172s
+  VM 4      3472.8 B/s over 171s
+  VM 5      3382.5 B/s over 169s
+  VM 6       973.5 B/s over 167s
+  VM 7       848.1 B/s over 165s
+  VM 8      2458.2 B/s over 164s
+  VM 9       408.0 B/s over 163s
+  per node: mean 2114.8 B/s, group 21148.1 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 177s over 10 nodes
+  suspicions 0  -> 0.0000/s group, 0.0000/s per node
+  failures   127  -> 0.7175/s group, 0.0ç718/s per node

@@ -16,7 +16,7 @@ const (
 	gossipPeriod   = 250 * time.Millisecond
 	gossipFanout   = 2 // enough redundancy for the bounds, little enough that drops show up as false positives
 	sweepPeriod    = 100 * time.Millisecond
-	failTimeout    = 2500 * time.Millisecond // nosuspect: silence before declaring DEAD
+	failTimeout    = 1000 * time.Millisecond // nosuspect: silence before declaring DEAD
 	suspectTimeout = 1000 * time.Millisecond // suspect: silence before suspecting
 	confirmTimeout = 1500 * time.Millisecond // suspect: window for the node to refute
 	cleanupTimeout = 4 * time.Second         // outlives stale gossip so removed nodes aren't re-added
