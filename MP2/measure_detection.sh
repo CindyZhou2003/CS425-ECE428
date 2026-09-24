@@ -13,8 +13,8 @@ mode="${1-}"
 trials="${2:-5}"
 max_k="${3:-3}"
 case "$mode" in
-gossip) export NODE_FLAGS="-nosuspect" ;;
-suspect) export NODE_FLAGS="" ;;
+gossip) export NODE_FLAGS="-nosuspect ${NODE_FLAGS:-}" ;;
+suspect) export NODE_FLAGS="${NODE_FLAGS:-}" ;;
 *)
 	echo "usage: [NETID=your_netid] ./measure_detection.sh gossip|suspect [trials] [max_failures]" >&2
 	exit 1

@@ -85,8 +85,8 @@ def false_positives(logs):
     print(f"  failures   {failures}  -> {failures / secs:.4f}/s group, {failures / secs / nodes:.4f}/s per node")
 
 
-def detection(logs):
-    print("== detection time ==")
+def detection_trials(logs):
+    """Returns per-victim rows (k, vm, kill_ts, times, survivors) and per-k trial samples (mean first, max last)"""
     # Groups the kills of one ./vm.sh kill call, whose victims die within a second of each other
     kills = sorted((e[0], vm) for vm, events in logs.items() for e in events if e[1] == "[KILL]")
     sets = []
@@ -96,7 +96,7 @@ def detection(logs):
         else:
             sets.append([(ts, vm)])
 
-    all_times = []
+    rows = []
     by_k = {}
     for group in sets:
         victims = {vm for _, vm in group}
@@ -106,7 +106,7 @@ def detection(logs):
             # The victim's ID is whatever it last joined as before being killed
             ids = [JOINED.search(e[2]).group(1) for e in logs[vm] if e[1] == "[MEMBERSHIP]" and JOINED.search(e[2]) and e[0] <= kill_ts]
             if not ids:
-                print(f"  VM {vm}: killed at {kill_ts:%H:%M:%S.%f} but never logged a join")
+                rows.append((len(group), vm, kill_ts, None, survivors))
                 continue
             victim = ids[-1]
             times = []
@@ -115,18 +115,31 @@ def detection(logs):
                             and kill_ts <= e[0] <= kill_ts + timedelta(seconds=DETECT_WINDOW)), None)
                 if hit:
                     times.append((hit - kill_ts).total_seconds())
-            if len(times) < len(survivors):
-                print(f"  VM {vm} killed at {kill_ts:%H:%M:%S.%f}: only {len(times)}/{len(survivors)} survivors detected it")
-            if not times:
-                continue
-            all_times += times
-            firsts.append(min(times))
-            lasts.append(max(times))
-            print(f"  k={len(group)} VM {vm} killed at {kill_ts:%H:%M:%S.%f}: {len(times)} detectors, "
-                  f"first {min(times):.3f}s, mean {mean(times):.3f}s, last {max(times):.3f}s")
+            rows.append((len(group), vm, kill_ts, times, survivors))
+            if times:
+                firsts.append(min(times))
+                lasts.append(max(times))
         if firsts:
             # One sample per trial: mean time to first detection, and time until everyone knows everything
             by_k.setdefault(len(group), []).append((mean(firsts), max(lasts)))
+    return rows, by_k
+
+
+def detection(logs):
+    print("== detection time ==")
+    rows, by_k = detection_trials(logs)
+    all_times = []
+    for k, vm, kill_ts, times, survivors in rows:
+        if times is None:
+            print(f"  VM {vm}: killed at {kill_ts:%H:%M:%S.%f} but never logged a join")
+            continue
+        if len(times) < len(survivors):
+            print(f"  VM {vm} killed at {kill_ts:%H:%M:%S.%f}: only {len(times)}/{len(survivors)} survivors detected it")
+        if not times:
+            continue
+        all_times += times
+        print(f"  k={k} VM {vm} killed at {kill_ts:%H:%M:%S.%f}: {len(times)} detectors, "
+              f"first {min(times):.3f}s, mean {mean(times):.3f}s, last {max(times):.3f}s")
     if all_times:
         print(f"  overall: mean {mean(all_times):.3f}s, stdev {pstdev(all_times):.3f}s, "
               f"max {max(all_times):.3f}s, n={len(all_times)}")
@@ -169,4 +182,5 @@ def main():
         detection(logs)
 
 
-main()
+if __name__ == "__main__":
+    main()

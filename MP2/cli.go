@@ -157,6 +157,10 @@ func (c *cli) join() {
 	node, err := NewNode(c.port, c.introducer, c.suspicion)
 	if err != nil {
 		fmt.Printf("join failed: %v\n", err)
+		// Exits so vm.sh sees the failure instead of an idle process
+		if c.daemon {
+			os.Exit(1)
+		}
 		return
 	}
 	c.node = node
