@@ -1,0 +1,626 @@
+2026-09-24 18:16:59.618 [MEMBERSHIP] Joined as 172.22.158.76:8000:1790291819618
+2026-09-24 18:16:59.619 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790291813987 (Status: ALIVE)
+2026-09-24 18:16:59.619 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790291817254 (Status: ALIVE)
+2026-09-24 18:16:59.619 [MEMBERSHIP] New member added: 172.22.158.75:8000:1790291811940 (Status: ALIVE)
+2026-09-24 18:17:00.619 [BW] sent=2691 recv=3807 bytes over 1s
+2026-09-24 18:17:01.620 [BW] sent=3384 recv=3384 bytes over 1s
+2026-09-24 18:17:02.489 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790291822393 (Status: ALIVE)
+2026-09-24 18:17:02.619 [BW] sent=3390 recv=3054 bytes over 1s
+2026-09-24 18:17:03.619 [BW] sent=4096 recv=3072 bytes over 1s
+2026-09-24 18:17:04.620 [BW] sent=5120 recv=5120 bytes over 1s
+2026-09-24 18:17:05.239 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790291825154 (Status: ALIVE)
+2026-09-24 18:17:05.620 [BW] sent=3256 recv=4882 bytes over 1s
+2026-09-24 18:17:06.619 [BW] sent=4816 recv=5418 bytes over 1s
+2026-09-24 18:17:07.619 [BW] sent=4816 recv=4817 bytes over 1s
+2026-09-24 18:17:07.691 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790291827519 (Status: ALIVE)
+2026-09-24 18:17:08.619 [BW] sent=5358 recv=8126 bytes over 1s
+2026-09-24 18:17:09.620 [BW] sent=5536 recv=6228 bytes over 1s
+2026-09-24 18:17:10.005 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790291829869 (Status: ALIVE)
+2026-09-24 18:17:10.619 [BW] sent=5892 recv=8237 bytes over 1s
+2026-09-24 18:17:11.620 [BW] sent=7810 recv=5467 bytes over 1s
+2026-09-24 18:17:12.619 [BW] sent=4686 recv=2343 bytes over 1s
+2026-09-24 18:17:12.870 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790291832471 (Status: ALIVE)
+2026-09-24 18:17:13.620 [BW] sent=6610 recv=6879 bytes over 1s
+2026-09-24 18:17:14.620 [BW] sent=6968 recv=10452 bytes over 1s
+2026-09-24 18:17:15.395 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790291835084 (Status: ALIVE)
+2026-09-24 18:17:15.619 [BW] sent=6972 recv=10817 bytes over 1s
+2026-09-24 18:17:16.619 [BW] sent=7688 recv=9610 bytes over 1s
+2026-09-24 18:17:17.619 [BW] sent=7694 recv=3847 bytes over 1s
+2026-09-24 18:17:18.619 [BW] sent=7702 recv=8667 bytes over 1s
+2026-09-24 18:17:19.620 [BW] sent=7708 recv=3855 bytes over 1s
+2026-09-24 18:17:20.620 [BW] sent=7712 recv=13496 bytes over 1s
+2026-09-24 18:17:21.619 [BW] sent=7712 recv=9640 bytes over 1s
+2026-09-24 18:17:22.619 [BW] sent=7716 recv=8679 bytes over 1s
+2026-09-24 18:17:23.620 [BW] sent=7720 recv=6755 bytes over 1s
+2026-09-24 18:17:24.619 [BW] sent=7722 recv=2895 bytes over 1s
+2026-09-24 18:17:25.620 [BW] sent=9660 recv=3864 bytes over 1s
+2026-09-24 18:17:26.619 [BW] sent=5796 recv=9660 bytes over 1s
+2026-09-24 18:17:27.619 [BW] sent=7728 recv=7731 bytes over 1s
+2026-09-24 18:17:28.619 [BW] sent=7736 recv=8703 bytes over 1s
+2026-09-24 18:17:29.619 [BW] sent=7736 recv=6769 bytes over 1s
+2026-09-24 18:17:30.620 [BW] sent=7740 recv=7739 bytes over 1s
+2026-09-24 18:17:31.619 [BW] sent=7744 recv=8712 bytes over 1s
+2026-09-24 18:17:32.619 [BW] sent=7744 recv=8714 bytes over 1s
+2026-09-24 18:17:33.619 [BW] sent=7752 recv=10658 bytes over 1s
+2026-09-24 18:17:34.620 [BW] sent=7752 recv=2907 bytes over 1s
+2026-09-24 18:17:34.756 [FAILURE] Communicated failure: 172.22.94.75:8000:1790291813987 confirmed DEAD
+2026-09-24 18:17:35.619 [BW] sent=7752 recv=7751 bytes over 1s
+2026-09-24 18:17:36.620 [BW] sent=7752 recv=7752 bytes over 1s
+2026-09-24 18:17:37.620 [BW] sent=7752 recv=4846 bytes over 1s
+2026-09-24 18:17:38.620 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:17:38.819 [MEMBERSHIP] Removed 172.22.94.75:8000:1790291813987 (DEAD)
+2026-09-24 18:17:39.620 [BW] sent=7226 recv=5375 bytes over 1s
+2026-09-24 18:17:40.619 [BW] sent=7054 recv=9699 bytes over 1s
+2026-09-24 18:17:41.619 [BW] sent=7056 recv=8820 bytes over 1s
+2026-09-24 18:17:42.619 [BW] sent=7056 recv=6174 bytes over 1s
+2026-09-24 18:17:43.619 [BW] sent=7056 recv=2646 bytes over 1s
+2026-09-24 18:17:44.619 [BW] sent=7056 recv=11466 bytes over 1s
+2026-09-24 18:17:45.620 [BW] sent=7056 recv=7056 bytes over 1s
+2026-09-24 18:17:46.620 [BW] sent=7056 recv=7938 bytes over 1s
+2026-09-24 18:17:47.619 [BW] sent=7056 recv=8820 bytes over 1s
+2026-09-24 18:17:48.619 [BW] sent=8820 recv=3528 bytes over 1s
+2026-09-24 18:17:49.505 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790291868864 (Status: ALIVE)
+2026-09-24 18:17:49.620 [BW] sent=5292 recv=3616 bytes over 1s
+2026-09-24 18:17:50.619 [BW] sent=7760 recv=3880 bytes over 1s
+2026-09-24 18:17:51.619 [BW] sent=7762 recv=7763 bytes over 1s
+2026-09-24 18:17:52.620 [BW] sent=9710 recv=9710 bytes over 1s
+2026-09-24 18:17:53.619 [BW] sent=5826 recv=5826 bytes over 1s
+2026-09-24 18:17:54.619 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:17:55.619 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:17:56.620 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:17:57.619 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:17:58.619 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:17:59.619 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:18:00.619 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:18:01.619 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:18:02.620 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:18:03.620 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:18:04.619 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:18:05.619 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:18:06.619 [BW] sent=7768 recv=11652 bytes over 1s
+2026-09-24 18:18:07.619 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:18:08.619 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:18:08.819 [FAILURE] Detected failure of 172.22.156.77:8000:1790291817254: no heartbeat for 2.564s
+2026-09-24 18:18:09.620 [BW] sent=7762 recv=9704 bytes over 1s
+2026-09-24 18:18:10.619 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:18:11.620 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:18:12.619 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:18:12.819 [MEMBERSHIP] Removed 172.22.156.77:8000:1790291817254 (DEAD)
+2026-09-24 18:18:13.620 [BW] sent=7220 recv=11010 bytes over 1s
+2026-09-24 18:18:14.619 [BW] sent=7044 recv=10570 bytes over 1s
+2026-09-24 18:18:15.620 [BW] sent=7048 recv=7929 bytes over 1s
+2026-09-24 18:18:16.619 [BW] sent=7048 recv=11453 bytes over 1s
+2026-09-24 18:18:17.620 [BW] sent=7048 recv=8810 bytes over 1s
+2026-09-24 18:18:18.619 [BW] sent=7048 recv=8810 bytes over 1s
+2026-09-24 18:18:19.619 [BW] sent=7048 recv=6167 bytes over 1s
+2026-09-24 18:18:20.620 [BW] sent=7048 recv=9691 bytes over 1s
+2026-09-24 18:18:21.619 [BW] sent=7048 recv=7048 bytes over 1s
+2026-09-24 18:18:22.620 [BW] sent=7048 recv=5286 bytes over 1s
+2026-09-24 18:18:23.619 [BW] sent=7048 recv=9691 bytes over 1s
+2026-09-24 18:18:24.611 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790291904111 (Status: ALIVE)
+2026-09-24 18:18:24.620 [BW] sent=7048 recv=4494 bytes over 1s
+2026-09-24 18:18:25.619 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:18:26.619 [BW] sent=7762 recv=6792 bytes over 1s
+2026-09-24 18:18:27.619 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:18:28.619 [BW] sent=7768 recv=11652 bytes over 1s
+2026-09-24 18:18:29.620 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:18:30.619 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:18:31.619 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:18:32.619 [BW] sent=7768 recv=11652 bytes over 1s
+2026-09-24 18:18:33.620 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:18:34.619 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:18:35.619 [BW] sent=7768 recv=1942 bytes over 1s
+2026-09-24 18:18:36.619 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:18:37.620 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:18:38.619 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:18:39.619 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:18:40.620 [BW] sent=9710 recv=6797 bytes over 1s
+2026-09-24 18:18:41.006 [KILL] SIGKILL on VM 4
+2026-09-24 18:18:57.490 [MEMBERSHIP] Joined as 172.22.158.76:8000:1790291937490
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790291904111 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790291822393 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790291832471 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.158.75:8000:1790291811940 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790291868864 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790291825154 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790291827519 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790291829869 (Status: ALIVE)
+2026-09-24 18:18:57.491 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790291835084 (Status: ALIVE)
+2026-09-24 18:18:58.491 [BW] sent=5973 recv=7760 bytes over 1s
+2026-09-24 18:18:59.491 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:19:00.491 [BW] sent=7766 recv=7766 bytes over 1s
+2026-09-24 18:19:01.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:19:02.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:03.491 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:19:04.491 [BW] sent=9710 recv=10681 bytes over 1s
+2026-09-24 18:19:05.491 [BW] sent=5826 recv=8739 bytes over 1s
+2026-09-24 18:19:06.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:19:07.491 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:19:08.491 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:19:09.491 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:19:10.491 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:19:11.491 [BW] sent=7768 recv=15536 bytes over 1s
+2026-09-24 18:19:12.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:19:13.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:19:14.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:15.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:19:16.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:17.116 [FAILURE] Communicated failure: 172.22.94.76:8000:1790291822393 confirmed DEAD
+2026-09-24 18:19:17.491 [BW] sent=7766 recv=10673 bytes over 1s
+2026-09-24 18:19:18.491 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:19:19.491 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:19:20.491 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:19:21.191 [MEMBERSHIP] Removed 172.22.94.76:8000:1790291822393 (DEAD)
+2026-09-24 18:19:21.490 [BW] sent=7582 recv=8552 bytes over 1s
+2026-09-24 18:19:22.490 [BW] sent=7050 recv=6168 bytes over 1s
+2026-09-24 18:19:23.491 [BW] sent=7056 recv=11464 bytes over 1s
+2026-09-24 18:19:24.491 [BW] sent=7056 recv=7056 bytes over 1s
+2026-09-24 18:19:25.491 [BW] sent=7056 recv=11466 bytes over 1s
+2026-09-24 18:19:26.491 [BW] sent=7056 recv=7056 bytes over 1s
+2026-09-24 18:19:27.491 [BW] sent=7056 recv=6174 bytes over 1s
+2026-09-24 18:19:28.491 [BW] sent=7056 recv=7938 bytes over 1s
+2026-09-24 18:19:29.490 [BW] sent=7056 recv=8820 bytes over 1s
+2026-09-24 18:19:30.491 [BW] sent=7056 recv=7056 bytes over 1s
+2026-09-24 18:19:31.362 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790291970872 (Status: ALIVE)
+2026-09-24 18:19:31.491 [BW] sent=7056 recv=6350 bytes over 1s
+2026-09-24 18:19:32.490 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:19:33.491 [BW] sent=7762 recv=6794 bytes over 1s
+2026-09-24 18:19:34.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:35.490 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:36.490 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:37.490 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:19:38.491 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:19:39.491 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:19:40.491 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:19:41.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:42.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:43.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:19:44.491 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:19:45.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:19:46.491 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:19:47.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:19:48.491 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:19:49.491 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:19:50.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:19:50.491 [FAILURE] Detected failure of 172.22.156.78:8000:1790291825154: no heartbeat for 2.585s
+2026-09-24 18:19:51.490 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:19:52.491 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:19:53.491 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:19:54.491 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:19:54.591 [MEMBERSHIP] Removed 172.22.156.78:8000:1790291825154 (DEAD)
+2026-09-24 18:19:55.491 [BW] sent=7220 recv=9770 bytes over 1s
+2026-09-24 18:19:56.491 [BW] sent=7044 recv=6166 bytes over 1s
+2026-09-24 18:19:57.491 [BW] sent=7048 recv=3524 bytes over 1s
+2026-09-24 18:19:58.491 [BW] sent=7048 recv=7048 bytes over 1s
+2026-09-24 18:19:59.491 [BW] sent=7048 recv=8810 bytes over 1s
+2026-09-24 18:20:00.491 [BW] sent=7048 recv=7929 bytes over 1s
+2026-09-24 18:20:01.491 [BW] sent=7048 recv=8810 bytes over 1s
+2026-09-24 18:20:02.490 [BW] sent=7048 recv=5286 bytes over 1s
+2026-09-24 18:20:03.491 [BW] sent=7048 recv=4405 bytes over 1s
+2026-09-24 18:20:04.491 [BW] sent=8810 recv=7929 bytes over 1s
+2026-09-24 18:20:04.955 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790292004763 (Status: ALIVE)
+2026-09-24 18:20:05.491 [BW] sent=5642 recv=3791 bytes over 1s
+2026-09-24 18:20:06.491 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:20:07.491 [BW] sent=7760 recv=7762 bytes over 1s
+2026-09-24 18:20:08.491 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:20:09.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:20:10.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:20:11.491 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:20:12.491 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:20:13.490 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:20:14.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:20:15.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:20:16.491 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:20:17.491 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:20:18.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:20:19.491 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:20:20.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:20:21.490 [BW] sent=7768 recv=14565 bytes over 1s
+2026-09-24 18:20:22.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:20:23.490 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:20:24.091 [FAILURE] Detected failure of 172.22.158.77:8000:1790291827519: no heartbeat for 2.57s
+2026-09-24 18:20:24.191 [FAILURE] Communicated failure: 172.22.94.77:8000:1790291829869 confirmed DEAD
+2026-09-24 18:20:24.491 [BW] sent=7764 recv=9704 bytes over 1s
+2026-09-24 18:20:25.491 [BW] sent=7752 recv=6783 bytes over 1s
+2026-09-24 18:20:26.491 [BW] sent=7752 recv=4845 bytes over 1s
+2026-09-24 18:20:27.491 [BW] sent=7752 recv=5814 bytes over 1s
+2026-09-24 18:20:28.191 [MEMBERSHIP] Removed 172.22.158.77:8000:1790291827519 (DEAD)
+2026-09-24 18:20:28.291 [MEMBERSHIP] Removed 172.22.94.77:8000:1790291829869 (DEAD)
+2026-09-24 18:20:28.491 [BW] sent=7572 recv=8542 bytes over 1s
+2026-09-24 18:20:29.491 [BW] sent=6320 recv=5530 bytes over 1s
+2026-09-24 18:20:30.491 [BW] sent=6324 recv=4746 bytes over 1s
+2026-09-24 18:20:31.491 [BW] sent=6328 recv=6328 bytes over 1s
+2026-09-24 18:20:32.491 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:20:33.491 [BW] sent=6328 recv=3164 bytes over 1s
+2026-09-24 18:20:34.491 [BW] sent=6328 recv=5537 bytes over 1s
+2026-09-24 18:20:35.491 [BW] sent=6328 recv=6328 bytes over 1s
+2026-09-24 18:20:36.491 [BW] sent=7910 recv=6328 bytes over 1s
+2026-09-24 18:20:37.491 [BW] sent=4746 recv=7910 bytes over 1s
+2026-09-24 18:20:38.192 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790292038140 (Status: ALIVE)
+2026-09-24 18:20:38.491 [BW] sent=6506 recv=8266 bytes over 1s
+2026-09-24 18:20:39.491 [BW] sent=7040 recv=3520 bytes over 1s
+2026-09-24 18:20:40.491 [BW] sent=7040 recv=6160 bytes over 1s
+2026-09-24 18:20:40.972 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790292040485 (Status: ALIVE)
+2026-09-24 18:20:41.491 [BW] sent=7396 recv=5814 bytes over 1s
+2026-09-24 18:20:42.491 [BW] sent=7752 recv=10659 bytes over 1s
+2026-09-24 18:20:43.491 [BW] sent=7756 recv=8726 bytes over 1s
+2026-09-24 18:20:44.491 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:20:45.490 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:20:46.491 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:20:47.491 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:20:48.491 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:20:49.490 [BW] sent=7760 recv=11640 bytes over 1s
+2026-09-24 18:20:50.491 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:20:51.491 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:20:52.491 [BW] sent=9700 recv=6790 bytes over 1s
+2026-09-24 18:20:53.491 [BW] sent=5820 recv=10670 bytes over 1s
+2026-09-24 18:20:54.491 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:20:55.491 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:20:56.491 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:20:57.491 [BW] sent=9700 recv=11640 bytes over 1s
+2026-09-24 18:20:58.491 [BW] sent=5820 recv=7760 bytes over 1s
+2026-09-24 18:20:59.490 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:21:00.091 [FAILURE] Detected failure of 172.22.156.79:8000:1790291832471: no heartbeat for 2.575s
+2026-09-24 18:21:00.091 [FAILURE] Detected failure of 172.22.158.78:8000:1790291835084: no heartbeat for 2.575s
+2026-09-24 18:21:00.491 [BW] sent=7756 recv=970 bytes over 1s
+2026-09-24 18:21:01.491 [BW] sent=7744 recv=10648 bytes over 1s
+2026-09-24 18:21:02.490 [BW] sent=7750 recv=6782 bytes over 1s
+2026-09-24 18:21:03.491 [BW] sent=7752 recv=7754 bytes over 1s
+2026-09-24 18:21:04.191 [MEMBERSHIP] Removed 172.22.158.78:8000:1790291835084 (DEAD)
+2026-09-24 18:21:04.191 [MEMBERSHIP] Removed 172.22.156.79:8000:1790291832471 (DEAD)
+2026-09-24 18:21:04.491 [BW] sent=7400 recv=10130 bytes over 1s
+2026-09-24 18:21:05.490 [BW] sent=6320 recv=6321 bytes over 1s
+2026-09-24 18:21:06.491 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:21:07.491 [BW] sent=6328 recv=3164 bytes over 1s
+2026-09-24 18:21:08.491 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:21:09.491 [BW] sent=6328 recv=4746 bytes over 1s
+2026-09-24 18:21:10.491 [BW] sent=6328 recv=3164 bytes over 1s
+2026-09-24 18:21:11.491 [BW] sent=6328 recv=7910 bytes over 1s
+2026-09-24 18:21:12.491 [BW] sent=6328 recv=4746 bytes over 1s
+2026-09-24 18:21:13.491 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:21:14.490 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:21:15.373 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790292075019 (Status: ALIVE)
+2026-09-24 18:21:15.491 [BW] sent=6328 recv=7999 bytes over 1s
+2026-09-24 18:21:16.491 [BW] sent=7040 recv=7920 bytes over 1s
+2026-09-24 18:21:17.491 [BW] sent=7040 recv=7921 bytes over 1s
+2026-09-24 18:21:18.442 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790292078129 (Status: ALIVE)
+2026-09-24 18:21:18.491 [BW] sent=7048 recv=6255 bytes over 1s
+2026-09-24 18:21:19.491 [BW] sent=9700 recv=7760 bytes over 1s
+2026-09-24 18:21:20.491 [BW] sent=5820 recv=7760 bytes over 1s
+2026-09-24 18:21:21.490 [BW] sent=7766 recv=9710 bytes over 1s
+2026-09-24 18:21:22.491 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:21:23.491 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:21:24.491 [BW] sent=7768 recv=12623 bytes over 1s
+2026-09-24 18:21:25.491 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:21:26.490 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:21:27.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:21:28.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:21:29.491 [BW] sent=7768 recv=5826 bytes over 1s
+2026-09-24 18:21:30.491 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:21:31.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:21:32.491 [BW] sent=9710 recv=9710 bytes over 1s
+2026-09-24 18:21:33.491 [BW] sent=5826 recv=9710 bytes over 1s
+2026-09-24 18:21:34.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:21:35.490 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:21:36.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:21:37.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:21:38.490 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:21:38.490 [FAILURE] Detected failure of 172.22.94.75:8000:1790291868864: no heartbeat for 2.6s
+2026-09-24 18:21:38.891 [FAILURE] Detected failure of 172.22.156.77:8000:1790291904111: no heartbeat for 2.529s
+2026-09-24 18:21:39.491 [BW] sent=7758 recv=7755 bytes over 1s
+2026-09-24 18:21:40.491 [BW] sent=7756 recv=7756 bytes over 1s
+2026-09-24 18:21:41.491 [BW] sent=7760 recv=11640 bytes over 1s
+2026-09-24 18:21:42.491 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:21:42.591 [MEMBERSHIP] Removed 172.22.94.75:8000:1790291868864 (DEAD)
+2026-09-24 18:21:42.991 [MEMBERSHIP] Removed 172.22.156.77:8000:1790291904111 (DEAD)
+2026-09-24 18:21:43.491 [BW] sent=7050 recv=7752 bytes over 1s
+2026-09-24 18:21:44.491 [BW] sent=6336 recv=7920 bytes over 1s
+2026-09-24 18:21:45.490 [BW] sent=6336 recv=5544 bytes over 1s
+2026-09-24 18:21:46.490 [BW] sent=6336 recv=5544 bytes over 1s
+2026-09-24 18:21:47.490 [BW] sent=6336 recv=6336 bytes over 1s
+2026-09-24 18:21:48.490 [BW] sent=6336 recv=7128 bytes over 1s
+2026-09-24 18:21:49.490 [BW] sent=6336 recv=7128 bytes over 1s
+2026-09-24 18:21:50.491 [BW] sent=6336 recv=7128 bytes over 1s
+2026-09-24 18:21:51.491 [BW] sent=6336 recv=8712 bytes over 1s
+2026-09-24 18:21:52.491 [BW] sent=6336 recv=3960 bytes over 1s
+2026-09-24 18:21:53.191 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790292113112 (Status: ALIVE)
+2026-09-24 18:21:53.490 [BW] sent=6512 recv=4048 bytes over 1s
+2026-09-24 18:21:54.491 [BW] sent=7040 recv=4400 bytes over 1s
+2026-09-24 18:21:55.491 [BW] sent=7040 recv=7041 bytes over 1s
+2026-09-24 18:21:56.491 [BW] sent=7048 recv=7047 bytes over 1s
+2026-09-24 18:21:56.623 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790292116377 (Status: ALIVE)
+2026-09-24 18:21:57.491 [BW] sent=7582 recv=8730 bytes over 1s
+2026-09-24 18:21:58.491 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:21:59.491 [BW] sent=7762 recv=7765 bytes over 1s
+2026-09-24 18:22:00.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:22:01.490 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:22:02.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:22:03.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:22:04.491 [BW] sent=9710 recv=8739 bytes over 1s
+2026-09-24 18:22:05.491 [BW] sent=5826 recv=9710 bytes over 1s
+2026-09-24 18:22:06.491 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:22:07.491 [BW] sent=9710 recv=4855 bytes over 1s
+2026-09-24 18:22:08.490 [BW] sent=5826 recv=5826 bytes over 1s
+2026-09-24 18:22:09.490 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:22:10.491 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:22:11.491 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:22:12.490 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:22:13.491 [BW] sent=7768 recv=2913 bytes over 1s
+2026-09-24 18:22:13.982 [KILL] SIGKILL on VM 4
+2026-09-24 18:22:30.531 [MEMBERSHIP] Joined as 172.22.158.76:8000:1790292150531
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790292038140 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790292075019 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790292040485 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.158.75:8000:1790291811940 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790292113112 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790292004763 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790292078129 (Status: ALIVE)
+2026-09-24 18:22:30.532 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790292116377 (Status: ALIVE)
+2026-09-24 18:22:31.532 [BW] sent=7201 recv=8810 bytes over 1s
+2026-09-24 18:22:32.532 [BW] sent=5286 recv=3524 bytes over 1s
+2026-09-24 18:22:33.128 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790292152881 (Status: ALIVE)
+2026-09-24 18:22:33.532 [BW] sent=7230 recv=6436 bytes over 1s
+2026-09-24 18:22:34.532 [BW] sent=7760 recv=11640 bytes over 1s
+2026-09-24 18:22:35.532 [BW] sent=7762 recv=6791 bytes over 1s
+2026-09-24 18:22:36.532 [BW] sent=9710 recv=6797 bytes over 1s
+2026-09-24 18:22:37.532 [BW] sent=5826 recv=9710 bytes over 1s
+2026-09-24 18:22:38.532 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:22:39.532 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:22:40.532 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:22:41.532 [BW] sent=7768 recv=11652 bytes over 1s
+2026-09-24 18:22:42.532 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:22:43.532 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:22:44.532 [BW] sent=7768 recv=2913 bytes over 1s
+2026-09-24 18:22:45.532 [BW] sent=9710 recv=7768 bytes over 1s
+2026-09-24 18:22:46.532 [BW] sent=5826 recv=5826 bytes over 1s
+2026-09-24 18:22:47.532 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:22:48.532 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:22:49.532 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:22:50.532 [BW] sent=7768 recv=11652 bytes over 1s
+2026-09-24 18:22:51.532 [BW] sent=7768 recv=971 bytes over 1s
+2026-09-24 18:22:52.533 [BW] sent=9710 recv=1942 bytes over 1s
+2026-09-24 18:22:52.832 [FAILURE] Detected failure of 172.22.156.78:8000:1790292004763: no heartbeat for 2.567s
+2026-09-24 18:22:52.832 [FAILURE] Detected failure of 172.22.158.77:8000:1790292038140: no heartbeat for 2.567s
+2026-09-24 18:22:53.532 [BW] sent=5818 recv=5820 bytes over 1s
+2026-09-24 18:22:54.532 [BW] sent=7752 recv=3876 bytes over 1s
+2026-09-24 18:22:55.532 [BW] sent=7754 recv=8722 bytes over 1s
+2026-09-24 18:22:56.532 [BW] sent=7760 recv=3880 bytes over 1s
+2026-09-24 18:22:56.832 [MEMBERSHIP] Removed 172.22.156.78:8000:1790292004763 (DEAD)
+2026-09-24 18:22:56.832 [MEMBERSHIP] Removed 172.22.158.77:8000:1790292038140 (DEAD)
+2026-09-24 18:22:57.532 [BW] sent=7040 recv=8620 bytes over 1s
+2026-09-24 18:22:58.532 [BW] sent=6324 recv=3953 bytes over 1s
+2026-09-24 18:22:59.532 [BW] sent=6328 recv=5537 bytes over 1s
+2026-09-24 18:23:00.532 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:23:01.532 [BW] sent=6328 recv=7910 bytes over 1s
+2026-09-24 18:23:02.532 [BW] sent=6328 recv=9492 bytes over 1s
+2026-09-24 18:23:03.532 [BW] sent=6328 recv=7119 bytes over 1s
+2026-09-24 18:23:04.532 [BW] sent=7910 recv=5537 bytes over 1s
+2026-09-24 18:23:05.532 [BW] sent=4746 recv=6328 bytes over 1s
+2026-09-24 18:23:06.532 [BW] sent=6328 recv=7910 bytes over 1s
+2026-09-24 18:23:07.532 [BW] sent=6328 recv=6328 bytes over 1s
+2026-09-24 18:23:07.691 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790292187235 (Status: ALIVE)
+2026-09-24 18:23:08.532 [BW] sent=6862 recv=5280 bytes over 1s
+2026-09-24 18:23:09.532 [BW] sent=7040 recv=6161 bytes over 1s
+2026-09-24 18:23:09.691 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790292189617 (Status: ALIVE)
+2026-09-24 18:23:10.532 [BW] sent=7582 recv=6612 bytes over 1s
+2026-09-24 18:23:11.532 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:23:12.532 [BW] sent=7762 recv=5823 bytes over 1s
+2026-09-24 18:23:13.532 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:23:14.532 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:23:15.532 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:23:16.532 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:23:17.532 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:23:18.532 [BW] sent=7768 recv=11652 bytes over 1s
+2026-09-24 18:23:19.532 [BW] sent=7768 recv=10681 bytes over 1s
+2026-09-24 18:23:20.532 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:23:21.531 [BW] sent=7768 recv=9710 bytes over 1s
+2026-09-24 18:23:22.532 [BW] sent=7768 recv=8739 bytes over 1s
+2026-09-24 18:23:23.531 [BW] sent=7768 recv=4855 bytes over 1s
+2026-09-24 18:23:24.532 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:23:25.532 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:23:26.532 [BW] sent=7768 recv=7768 bytes over 1s
+2026-09-24 18:23:27.531 [BW] sent=7768 recv=6797 bytes over 1s
+2026-09-24 18:23:28.532 [BW] sent=7768 recv=3884 bytes over 1s
+2026-09-24 18:23:29.332 [FAILURE] Detected failure of 172.22.156.79:8000:1790292075019: no heartbeat for 2.562s
+2026-09-24 18:23:29.532 [BW] sent=7768 recv=6796 bytes over 1s
+2026-09-24 18:23:29.532 [FAILURE] Detected failure of 172.22.94.77:8000:1790292040485: no heartbeat for 2.545s
+2026-09-24 18:23:29.532 [FAILURE] Detected failure of 172.22.158.78:8000:1790292078129: no heartbeat for 2.545s
+2026-09-24 18:23:30.532 [BW] sent=7748 recv=6780 bytes over 1s
+2026-09-24 18:23:31.532 [BW] sent=7744 recv=5808 bytes over 1s
+2026-09-24 18:23:32.532 [BW] sent=7746 recv=5810 bytes over 1s
+2026-09-24 18:23:33.432 [MEMBERSHIP] Removed 172.22.156.79:8000:1790292075019 (DEAD)
+2026-09-24 18:23:33.532 [BW] sent=7752 recv=4755 bytes over 1s
+2026-09-24 18:23:33.532 [MEMBERSHIP] Removed 172.22.94.77:8000:1790292040485 (DEAD)
+2026-09-24 18:23:33.532 [MEMBERSHIP] Removed 172.22.158.78:8000:1790292078129 (DEAD)
+2026-09-24 18:23:34.532 [BW] sent=5958 recv=5079 bytes over 1s
+2026-09-24 18:23:35.532 [BW] sent=5606 recv=8412 bytes over 1s
+2026-09-24 18:23:36.532 [BW] sent=5608 recv=7010 bytes over 1s
+2026-09-24 18:23:37.532 [BW] sent=5608 recv=4907 bytes over 1s
+2026-09-24 18:23:38.532 [BW] sent=5608 recv=4907 bytes over 1s
+2026-09-24 18:23:39.532 [BW] sent=5608 recv=4206 bytes over 1s
+2026-09-24 18:23:40.531 [BW] sent=5608 recv=5608 bytes over 1s
+2026-09-24 18:23:41.532 [BW] sent=5608 recv=4206 bytes over 1s
+2026-09-24 18:23:42.532 [BW] sent=5608 recv=6309 bytes over 1s
+2026-09-24 18:23:43.532 [BW] sent=5608 recv=2804 bytes over 1s
+2026-09-24 18:23:44.118 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790292223411 (Status: ALIVE)
+2026-09-24 18:23:44.532 [BW] sent=5784 recv=3156 bytes over 1s
+2026-09-24 18:23:45.532 [BW] sent=6312 recv=7101 bytes over 1s
+2026-09-24 18:23:46.531 [BW] sent=6318 recv=10267 bytes over 1s
+2026-09-24 18:23:46.663 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790292226233 (Status: ALIVE)
+2026-09-24 18:23:47.532 [BW] sent=6854 recv=6064 bytes over 1s
+2026-09-24 18:23:48.532 [BW] sent=7032 recv=8790 bytes over 1s
+2026-09-24 18:23:49.234 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790292228869 (Status: ALIVE)
+2026-09-24 18:23:49.532 [BW] sent=7216 recv=11003 bytes over 1s
+2026-09-24 18:23:50.532 [BW] sent=7752 recv=9690 bytes over 1s
+2026-09-24 18:23:51.532 [BW] sent=7754 recv=7754 bytes over 1s
+2026-09-24 18:23:52.532 [BW] sent=7760 recv=7759 bytes over 1s
+2026-09-24 18:23:53.532 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:23:54.532 [BW] sent=9700 recv=11640 bytes over 1s
+2026-09-24 18:23:55.532 [BW] sent=5820 recv=5820 bytes over 1s
+2026-09-24 18:23:56.532 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:23:57.532 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:23:58.532 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:23:59.532 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:24:00.532 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:24:01.532 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:24:02.532 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:24:03.532 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:24:04.533 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:24:05.532 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:24:05.799 [KILL] SIGKILL on VM 4
+2026-09-24 18:24:28.648 [MEMBERSHIP] Joined as 172.22.158.76:8000:1790292268648
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790292266191 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790292187235 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790292226233 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790292189617 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790292228869 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790292152881 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790292223411 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.158.75:8000:1790291811940 (Status: ALIVE)
+2026-09-24 18:24:28.649 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790292263125 (Status: ALIVE)
+2026-09-24 18:24:29.649 [BW] sent=5967 recv=7752 bytes over 1s
+2026-09-24 18:24:30.649 [BW] sent=7752 recv=11628 bytes over 1s
+2026-09-24 18:24:31.649 [BW] sent=7758 recv=6786 bytes over 1s
+2026-09-24 18:24:32.649 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:24:33.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:24:34.648 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:24:35.649 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:24:36.649 [BW] sent=7760 recv=1940 bytes over 1s
+2026-09-24 18:24:37.649 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:24:38.649 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:24:39.649 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:24:40.648 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:24:41.649 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:24:42.649 [BW] sent=7760 recv=12610 bytes over 1s
+2026-09-24 18:24:43.648 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:24:44.649 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:24:45.649 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:24:46.649 [BW] sent=9700 recv=6790 bytes over 1s
+2026-09-24 18:24:47.648 [BW] sent=5820 recv=6790 bytes over 1s
+2026-09-24 18:24:48.149 [FAILURE] Detected failure of 172.22.158.77:8000:1790292189617: no heartbeat for 2.528s
+2026-09-24 18:24:48.376 [FAILURE] Communicated failure: 172.22.156.78:8000:1790292187235 confirmed DEAD
+2026-09-24 18:24:48.376 [FAILURE] Communicated failure: 172.22.94.76:8000:1790292152881 confirmed DEAD
+2026-09-24 18:24:48.648 [BW] sent=7756 recv=6785 bytes over 1s
+2026-09-24 18:24:49.649 [BW] sent=7744 recv=13552 bytes over 1s
+2026-09-24 18:24:50.649 [BW] sent=7744 recv=9680 bytes over 1s
+2026-09-24 18:24:51.649 [BW] sent=7748 recv=4842 bytes over 1s
+2026-09-24 18:24:52.249 [MEMBERSHIP] Removed 172.22.158.77:8000:1790292189617 (DEAD)
+2026-09-24 18:24:52.448 [MEMBERSHIP] Removed 172.22.94.76:8000:1790292152881 (DEAD)
+2026-09-24 18:24:52.449 [MEMBERSHIP] Removed 172.22.156.78:8000:1790292187235 (DEAD)
+2026-09-24 18:24:52.649 [BW] sent=7572 recv=9152 bytes over 1s
+2026-09-24 18:24:53.649 [BW] sent=7004 recv=4201 bytes over 1s
+2026-09-24 18:24:54.649 [BW] sent=4206 recv=3505 bytes over 1s
+2026-09-24 18:24:55.649 [BW] sent=5608 recv=4206 bytes over 1s
+2026-09-24 18:24:56.648 [BW] sent=5608 recv=5608 bytes over 1s
+2026-09-24 18:24:57.648 [BW] sent=5608 recv=6309 bytes over 1s
+2026-09-24 18:24:58.649 [BW] sent=5608 recv=7711 bytes over 1s
+2026-09-24 18:24:59.649 [BW] sent=5608 recv=2103 bytes over 1s
+2026-09-24 18:25:00.649 [BW] sent=5608 recv=5608 bytes over 1s
+2026-09-24 18:25:01.648 [BW] sent=5608 recv=4206 bytes over 1s
+2026-09-24 18:25:02.442 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790292302379 (Status: ALIVE)
+2026-09-24 18:25:02.649 [BW] sent=5608 recv=7274 bytes over 1s
+2026-09-24 18:25:03.648 [BW] sent=6312 recv=7013 bytes over 1s
+2026-09-24 18:25:04.649 [BW] sent=6312 recv=3945 bytes over 1s
+2026-09-24 18:25:05.443 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790292304963 (Status: ALIVE)
+2026-09-24 18:25:05.649 [BW] sent=6318 recv=8957 bytes over 1s
+2026-09-24 18:25:06.649 [BW] sent=7032 recv=7032 bytes over 1s
+2026-09-24 18:25:07.649 [BW] sent=7032 recv=4395 bytes over 1s
+2026-09-24 18:25:07.694 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790292307407 (Status: ALIVE)
+2026-09-24 18:25:08.649 [BW] sent=7572 recv=7752 bytes over 1s
+2026-09-24 18:25:09.649 [BW] sent=7752 recv=4845 bytes over 1s
+2026-09-24 18:25:10.648 [BW] sent=7758 recv=9699 bytes over 1s
+2026-09-24 18:25:11.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:25:12.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:25:13.649 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:25:14.648 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:15.649 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:25:16.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:25:17.649 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:25:18.649 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:19.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:25:20.648 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:25:21.649 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:22.649 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:25:23.648 [BW] sent=7760 recv=4850 bytes over 1s
+2026-09-24 18:25:24.648 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:25:25.649 [BW] sent=7760 recv=2910 bytes over 1s
+2026-09-24 18:25:26.649 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:25:26.749 [FAILURE] Detected failure of 172.22.94.77:8000:1790292223411: no heartbeat for 2.586s
+2026-09-24 18:25:27.192 [FAILURE] Communicated failure: 172.22.156.79:8000:1790292226233 confirmed DEAD
+2026-09-24 18:25:27.443 [FAILURE] Communicated failure: 172.22.158.78:8000:1790292228869 confirmed DEAD
+2026-09-24 18:25:27.649 [BW] sent=7754 recv=7751 bytes over 1s
+2026-09-24 18:25:28.649 [BW] sent=7744 recv=5808 bytes over 1s
+2026-09-24 18:25:29.649 [BW] sent=7744 recv=14520 bytes over 1s
+2026-09-24 18:25:30.649 [BW] sent=7748 recv=6783 bytes over 1s
+2026-09-24 18:25:30.749 [MEMBERSHIP] Removed 172.22.94.77:8000:1790292223411 (DEAD)
+2026-09-24 18:25:31.249 [MEMBERSHIP] Removed 172.22.156.79:8000:1790292226233 (DEAD)
+2026-09-24 18:25:31.449 [MEMBERSHIP] Removed 172.22.158.78:8000:1790292228869 (DEAD)
+2026-09-24 18:25:31.649 [BW] sent=7038 recv=6246 bytes over 1s
+2026-09-24 18:25:32.648 [BW] sent=5602 recv=4202 bytes over 1s
+2026-09-24 18:25:33.649 [BW] sent=5608 recv=7010 bytes over 1s
+2026-09-24 18:25:34.648 [BW] sent=5608 recv=6309 bytes over 1s
+2026-09-24 18:25:35.649 [BW] sent=5608 recv=6309 bytes over 1s
+2026-09-24 18:25:36.648 [BW] sent=7010 recv=7711 bytes over 1s
+2026-09-24 18:25:37.649 [BW] sent=4206 recv=4206 bytes over 1s
+2026-09-24 18:25:38.649 [BW] sent=5608 recv=9113 bytes over 1s
+2026-09-24 18:25:39.649 [BW] sent=7010 recv=3505 bytes over 1s
+2026-09-24 18:25:40.648 [BW] sent=5608 recv=4206 bytes over 1s
+2026-09-24 18:25:41.648 [BW] sent=4206 recv=6309 bytes over 1s
+2026-09-24 18:25:41.950 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790292341448 (Status: ALIVE)
+2026-09-24 18:25:42.648 [BW] sent=5960 recv=5259 bytes over 1s
+2026-09-24 18:25:43.648 [BW] sent=6312 recv=6312 bytes over 1s
+2026-09-24 18:25:44.630 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790292344228 (Status: ALIVE)
+2026-09-24 18:25:44.649 [BW] sent=8076 recv=5619 bytes over 1s
+2026-09-24 18:25:45.648 [BW] sent=5274 recv=10548 bytes over 1s
+2026-09-24 18:25:46.648 [BW] sent=7032 recv=4395 bytes over 1s
+2026-09-24 18:25:47.649 [BW] sent=7038 recv=5280 bytes over 1s
+2026-09-24 18:25:47.700 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790292347192 (Status: ALIVE)
+2026-09-24 18:25:48.649 [BW] sent=7574 recv=6783 bytes over 1s
+2026-09-24 18:25:49.649 [BW] sent=7752 recv=5815 bytes over 1s
+2026-09-24 18:25:50.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:25:51.649 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:25:52.648 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:25:53.649 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:54.649 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:25:55.649 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:56.648 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:57.648 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:25:58.649 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:25:59.649 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:26:00.649 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:26:01.649 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:26:02.648 [BW] sent=7760 recv=10670 bytes over 1s
+2026-09-24 18:26:03.649 [BW] sent=7760 recv=3880 bytes over 1s
+2026-09-24 18:26:04.650 [BW] sent=7760 recv=12610 bytes over 1s
+2026-09-24 18:26:04.876 [KILL] SIGKILL on VM 4
+2026-09-24 18:26:27.164 [MEMBERSHIP] Joined as 172.22.158.76:8000:1790292387164
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790292347192 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.158.75:8000:1790291811940 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790292381450 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790292383835 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790292302379 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790292341448 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790292304963 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790292307407 (Status: ALIVE)
+2026-09-24 18:26:27.166 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790292344228 (Status: ALIVE)
+2026-09-24 18:26:28.165 [BW] sent=5967 recv=6783 bytes over 1s
+2026-09-24 18:26:29.166 [BW] sent=7752 recv=7752 bytes over 1s
+2026-09-24 18:26:30.165 [BW] sent=7758 recv=4848 bytes over 1s
+2026-09-24 18:26:31.165 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:26:32.165 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:26:33.166 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:26:34.165 [BW] sent=7760 recv=11640 bytes over 1s
+2026-09-24 18:26:35.165 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:26:36.166 [BW] sent=7760 recv=2910 bytes over 1s
+2026-09-24 18:26:37.165 [BW] sent=7760 recv=11640 bytes over 1s
+2026-09-24 18:26:38.165 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:26:39.165 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:26:40.165 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:26:41.165 [BW] sent=7760 recv=6790 bytes over 1s
+2026-09-24 18:26:42.165 [BW] sent=7760 recv=5820 bytes over 1s
+2026-09-24 18:26:43.165 [BW] sent=7760 recv=7760 bytes over 1s
+2026-09-24 18:26:44.165 [BW] sent=7760 recv=9700 bytes over 1s
+2026-09-24 18:26:45.165 [BW] sent=7760 recv=8730 bytes over 1s
+2026-09-24 18:26:46.165 [BW] sent=7760 recv=1940 bytes over 1s
+2026-09-24 18:26:47.165 [BW] sent=7766 recv=7767 bytes over 1s
+2026-09-24 18:26:48.165 [BW] sent=7768 recv=4855 bytes over 1s

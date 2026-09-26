@@ -1,0 +1,358 @@
+2026-09-24 16:34:18.982 [PROTOCOL] Receiver drop rate set to 30.0%
+2026-09-24 16:34:18.984 [MEMBERSHIP] Joined as 172.22.158.75:8000:1790285658984
+2026-09-24 16:34:19.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:34:20.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:34:21.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:34:22.081 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790285662080 (Status: ALIVE)
+2026-09-24 16:34:22.081 [JOIN] Join request from 172.22.94.75:8000
+2026-09-24 16:34:22.581 [DROP] Dropped 245-byte message from 172.22.94.75:8000
+2026-09-24 16:34:22.985 [BW] sent=980 recv=889 bytes over 1s
+2026-09-24 16:34:23.331 [DROP] Dropped 245-byte message from 172.22.94.75:8000
+2026-09-24 16:34:23.831 [DROP] Dropped 245-byte message from 172.22.94.75:8000
+2026-09-24 16:34:23.985 [BW] sent=980 recv=980 bytes over 1s
+2026-09-24 16:34:24.082 [DROP] Dropped 245-byte message from 172.22.94.75:8000
+2026-09-24 16:34:24.332 [DROP] Dropped 246-byte message from 172.22.94.75:8000
+2026-09-24 16:34:24.831 [DROP] Dropped 246-byte message from 172.22.94.75:8000
+2026-09-24 16:34:24.985 [BW] sent=981 recv=983 bytes over 1s
+2026-09-24 16:34:25.290 [MEMBERSHIP] New member added: 172.22.156.77:8000:1790285665290 (Status: ALIVE)
+2026-09-24 16:34:25.290 [JOIN] Join request from 172.22.156.77:8000
+2026-09-24 16:34:25.331 [DROP] Dropped 246-byte message from 172.22.94.75:8000
+2026-09-24 16:34:25.791 [DROP] Dropped 335-byte message from 172.22.156.77:8000
+2026-09-24 16:34:25.985 [BW] sent=2167 recv=1987 bytes over 1s
+2026-09-24 16:34:26.332 [DROP] Dropped 335-byte message from 172.22.94.75:8000
+2026-09-24 16:34:26.582 [DROP] Dropped 335-byte message from 172.22.94.75:8000
+2026-09-24 16:34:26.790 [DROP] Dropped 335-byte message from 172.22.156.77:8000
+2026-09-24 16:34:26.985 [BW] sent=2680 recv=2680 bytes over 1s
+2026-09-24 16:34:27.831 [DROP] Dropped 336-byte message from 172.22.94.75:8000
+2026-09-24 16:34:27.985 [BW] sent=2682 recv=2684 bytes over 1s
+2026-09-24 16:34:28.291 [DROP] Dropped 336-byte message from 172.22.156.77:8000
+2026-09-24 16:34:28.325 [MEMBERSHIP] New member added: 172.22.158.76:8000:1790285668324 (Status: ALIVE)
+2026-09-24 16:34:28.325 [JOIN] Join request from 172.22.158.76:8000
+2026-09-24 16:34:28.331 [DROP] Dropped 336-byte message from 172.22.94.75:8000
+2026-09-24 16:34:28.581 [DROP] Dropped 425-byte message from 172.22.94.75:8000
+2026-09-24 16:34:28.831 [DROP] Dropped 425-byte message from 172.22.94.75:8000
+2026-09-24 16:34:28.985 [BW] sent=3469 recv=3199 bytes over 1s
+2026-09-24 16:34:29.325 [DROP] Dropped 425-byte message from 172.22.158.76:8000
+2026-09-24 16:34:29.985 [BW] sent=3400 recv=3400 bytes over 1s
+2026-09-24 16:34:30.831 [DROP] Dropped 425-byte message from 172.22.94.75:8000
+2026-09-24 16:34:30.855 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790285670855 (Status: ALIVE)
+2026-09-24 16:34:30.855 [JOIN] Join request from 172.22.94.76:8000
+2026-09-24 16:34:30.985 [BW] sent=3913 recv=2704 bytes over 1s
+2026-09-24 16:34:31.291 [DROP] Dropped 514-byte message from 172.22.156.77:8000
+2026-09-24 16:34:31.356 [JOIN] Join request from 172.22.94.76:8000
+2026-09-24 16:34:31.986 [BW] sent=5652 recv=2724 bytes over 1s
+2026-09-24 16:34:32.106 [DROP] Dropped 514-byte message from 172.22.94.76:8000
+2026-09-24 16:34:32.332 [DROP] Dropped 514-byte message from 172.22.94.75:8000
+2026-09-24 16:34:32.605 [DROP] Dropped 514-byte message from 172.22.94.76:8000
+2026-09-24 16:34:32.985 [BW] sent=3084 recv=2570 bytes over 1s
+2026-09-24 16:34:33.106 [DROP] Dropped 515-byte message from 172.22.94.76:8000
+2026-09-24 16:34:33.657 [DROP] Dropped 155-byte message from 172.22.156.78:8000
+2026-09-24 16:34:33.985 [BW] sent=4112 recv=2727 bytes over 1s
+2026-09-24 16:34:34.158 [MEMBERSHIP] New member added: 172.22.156.78:8000:1790285673657 (Status: ALIVE)
+2026-09-24 16:34:34.158 [JOIN] Join request from 172.22.156.78:8000
+2026-09-24 16:34:34.985 [BW] sent=5258 recv=3512 bytes over 1s
+2026-09-24 16:34:35.291 [DROP] Dropped 604-byte message from 172.22.156.77:8000
+2026-09-24 16:34:35.541 [DROP] Dropped 604-byte message from 172.22.156.77:8000
+2026-09-24 16:34:35.986 [BW] sent=4832 recv=4833 bytes over 1s
+2026-09-24 16:34:36.280 [DROP] Dropped 155-byte message from 172.22.158.77:8000
+2026-09-24 16:34:36.541 [DROP] Dropped 605-byte message from 172.22.156.77:8000
+2026-09-24 16:34:36.780 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790285676279 (Status: ALIVE)
+2026-09-24 16:34:36.780 [JOIN] Join request from 172.22.158.77:8000
+2026-09-24 16:34:36.985 [BW] sent=5534 recv=5148 bytes over 1s
+2026-09-24 16:34:37.530 [DROP] Dropped 694-byte message from 172.22.158.77:8000
+2026-09-24 16:34:37.575 [DROP] Dropped 694-byte message from 172.22.158.76:8000
+2026-09-24 16:34:37.985 [BW] sent=5552 recv=3470 bytes over 1s
+2026-09-24 16:34:38.575 [DROP] Dropped 694-byte message from 172.22.158.76:8000
+2026-09-24 16:34:38.599 [MEMBERSHIP] New member added: 172.22.94.77:8000:1790285678598 (Status: ALIVE)
+2026-09-24 16:34:38.599 [JOIN] Join request from 172.22.94.77:8000
+2026-09-24 16:34:38.985 [BW] sent=6513 recv=6404 bytes over 1s
+2026-09-24 16:34:39.099 [DROP] Dropped 783-byte message from 172.22.94.77:8000
+2026-09-24 16:34:39.407 [DROP] Dropped 783-byte message from 172.22.156.78:8000
+2026-09-24 16:34:39.985 [BW] sent=6264 recv=6264 bytes over 1s
+2026-09-24 16:34:40.332 [DROP] Dropped 783-byte message from 172.22.94.75:8000
+2026-09-24 16:34:40.934 [MEMBERSHIP] New member added: 172.22.156.79:8000:1790285680933 (Status: ALIVE)
+2026-09-24 16:34:40.934 [JOIN] Join request from 172.22.156.79:8000
+2026-09-24 16:34:40.985 [BW] sent=7136 recv=7985 bytes over 1s
+2026-09-24 16:34:41.576 [DROP] Dropped 873-byte message from 172.22.158.76:8000
+2026-09-24 16:34:41.985 [BW] sent=6982 recv=9420 bytes over 1s
+2026-09-24 16:34:42.030 [DROP] Dropped 872-byte message from 172.22.158.77:8000
+2026-09-24 16:34:42.041 [DROP] Dropped 873-byte message from 172.22.156.77:8000
+2026-09-24 16:34:42.291 [DROP] Dropped 871-byte message from 172.22.156.77:8000
+2026-09-24 16:34:42.781 [REFUTE] Self was marked DEAD; refuted with incarnation 1
+2026-09-24 16:34:42.831 [DROP] Dropped 873-byte message from 172.22.94.75:8000
+2026-09-24 16:34:42.935 [DROP] Dropped 873-byte message from 172.22.156.79:8000
+2026-09-24 16:34:42.985 [BW] sent=6984 recv=9589 bytes over 1s
+2026-09-24 16:34:43.435 [DROP] Dropped 874-byte message from 172.22.156.79:8000
+2026-09-24 16:34:43.790 [DROP] Dropped 872-byte message from 172.22.156.77:8000
+2026-09-24 16:34:43.856 [DROP] Dropped 870-byte message from 172.22.94.76:8000
+2026-09-24 16:34:43.935 [DROP] Dropped 875-byte message from 172.22.156.79:8000
+2026-09-24 16:34:43.985 [BW] sent=6988 recv=7852 bytes over 1s
+2026-09-24 16:34:44.356 [DROP] Dropped 870-byte message from 172.22.94.76:8000
+2026-09-24 16:34:44.365 [DROP] Dropped 155-byte message from 172.22.158.78:8000
+2026-09-24 16:34:44.435 [DROP] Dropped 875-byte message from 172.22.156.79:8000
+2026-09-24 16:34:44.866 [MEMBERSHIP] New member added: 172.22.158.78:8000:1790285684365 (Status: ALIVE)
+2026-09-24 16:34:44.866 [JOIN] Join request from 172.22.158.78:8000
+2026-09-24 16:34:44.985 [BW] sent=7964 recv=3802 bytes over 1s
+2026-09-24 16:34:45.185 [DROP] Dropped 962-byte message from 172.22.156.79:8000
+2026-09-24 16:34:45.331 [DROP] Dropped 873-byte message from 172.22.94.75:8000
+2026-09-24 16:34:45.349 [DROP] Dropped 872-byte message from 172.22.94.77:8000
+2026-09-24 16:34:45.385 [FAILURE] Detected failure of 172.22.94.75:8000:1790285662080: no heartbeat for 1.053s
+2026-09-24 16:34:45.385 [FAILURE] Detected failure of 172.22.94.76:8000:1790285670855: no heartbeat for 1.053s
+2026-09-24 16:34:45.385 [FAILURE] Detected failure of 172.22.158.77:8000:1790285676279: no heartbeat for 1.053s
+2026-09-24 16:34:45.385 [FAILURE] Detected failure of 172.22.156.77:8000:1790285665290: no heartbeat for 1.053s
+2026-09-24 16:34:45.385 [FAILURE] Detected failure of 172.22.156.78:8000:1790285673657: no heartbeat for 1.053s
+2026-09-24 16:34:45.386 [FAILURE] Detected failure of 172.22.156.79:8000:1790285680933: no heartbeat for 1.053s
+2026-09-24 16:34:45.600 [DROP] Dropped 872-byte message from 172.22.94.77:8000
+2026-09-24 16:34:45.850 [DROP] Dropped 783-byte message from 172.22.94.77:8000
+2026-09-24 16:34:45.866 [DROP] Dropped 962-byte message from 172.22.158.78:8000
+2026-09-24 16:34:45.985 [BW] sent=7688 recv=9166 bytes over 1s
+2026-09-24 16:34:46.582 [DROP] Dropped 959-byte message from 172.22.94.75:8000
+2026-09-24 16:34:46.985 [BW] sent=7664 recv=2882 bytes over 1s
+2026-09-24 16:34:47.280 [DROP] Dropped 780-byte message from 172.22.158.77:8000
+2026-09-24 16:34:47.331 [DROP] Dropped 961-byte message from 172.22.94.75:8000
+2026-09-24 16:34:47.365 [DROP] Dropped 961-byte message from 172.22.158.78:8000
+2026-09-24 16:34:47.986 [BW] sent=7672 recv=8542 bytes over 1s
+2026-09-24 16:34:48.581 [DROP] Dropped 961-byte message from 172.22.94.75:8000
+2026-09-24 16:34:48.908 [DROP] Dropped 874-byte message from 172.22.156.78:8000
+2026-09-24 16:34:48.986 [BW] sent=7672 recv=8203 bytes over 1s
+2026-09-24 16:34:49.485 [MEMBERSHIP] Removed 172.22.156.77:8000:1790285665290 (DEAD)
+2026-09-24 16:34:49.485 [MEMBERSHIP] Removed 172.22.156.78:8000:1790285673657 (DEAD)
+2026-09-24 16:34:49.485 [MEMBERSHIP] Removed 172.22.156.79:8000:1790285680933 (DEAD)
+2026-09-24 16:34:49.485 [MEMBERSHIP] Removed 172.22.94.75:8000:1790285662080 (DEAD)
+2026-09-24 16:34:49.485 [MEMBERSHIP] Removed 172.22.94.76:8000:1790285670855 (DEAD)
+2026-09-24 16:34:49.485 [MEMBERSHIP] Removed 172.22.158.77:8000:1790285676279 (DEAD)
+2026-09-24 16:34:49.576 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790285662080 (Status: ALIVE)
+2026-09-24 16:34:49.576 [MEMBERSHIP] New member added: 172.22.158.77:8000:1790285676279 (Status: ALIVE)
+2026-09-24 16:34:49.616 [DROP] Dropped 961-byte message from 172.22.158.78:8000
+2026-09-24 16:34:49.856 [DROP] Dropped 781-byte message from 172.22.94.76:8000
+2026-09-24 16:34:49.866 [DROP] Dropped 783-byte message from 172.22.158.78:8000
+2026-09-24 16:34:49.985 [BW] sent=5904 recv=5143 bytes over 1s
+2026-09-24 16:34:50.081 [MEMBERSHIP] New member added: 172.22.94.76:8000:1790285670855 (Status: ALIVE)
+2026-09-24 16:34:50.082 [FAILURE] Communicated failure: 172.22.158.77:8000:1790285676279 confirmed DEAD
+2026-09-24 16:34:50.100 [DROP] Dropped 784-byte message from 172.22.94.77:8000
+2026-09-24 16:34:50.331 [DROP] Dropped 695-byte message from 172.22.94.75:8000
+2026-09-24 16:34:50.366 [DROP] Dropped 783-byte message from 172.22.158.78:8000
+2026-09-24 16:34:50.866 [DROP] Dropped 783-byte message from 172.22.158.78:8000
+2026-09-24 16:34:50.985 [BW] sent=5384 recv=6088 bytes over 1s
+2026-09-24 16:34:51.075 [DROP] Dropped 784-byte message from 172.22.158.76:8000
+2026-09-24 16:34:51.349 [DROP] Dropped 695-byte message from 172.22.94.77:8000
+2026-09-24 16:34:51.866 [DROP] Dropped 606-byte message from 172.22.158.78:8000
+2026-09-24 16:34:51.985 [BW] sent=5560 recv=7820 bytes over 1s
+2026-09-24 16:34:52.825 [DROP] Dropped 695-byte message from 172.22.158.76:8000
+2026-09-24 16:34:52.856 [DROP] Dropped 695-byte message from 172.22.94.76:8000
+2026-09-24 16:34:52.985 [BW] sent=5560 recv=3564 bytes over 1s
+2026-09-24 16:34:53.106 [DROP] Dropped 696-byte message from 172.22.94.76:8000
+2026-09-24 16:34:53.350 [DROP] Dropped 696-byte message from 172.22.94.77:8000
+2026-09-24 16:34:53.356 [DROP] Dropped 696-byte message from 172.22.94.76:8000
+2026-09-24 16:34:53.849 [DROP] Dropped 607-byte message from 172.22.94.77:8000
+2026-09-24 16:34:53.985 [BW] sent=5566 recv=6086 bytes over 1s
+2026-09-24 16:34:54.085 [MEMBERSHIP] Removed 172.22.158.77:8000:1790285676279 (DEAD)
+2026-09-24 16:34:54.356 [DROP] Dropped 696-byte message from 172.22.94.76:8000
+2026-09-24 16:34:54.576 [DROP] Dropped 607-byte message from 172.22.158.76:8000
+2026-09-24 16:34:54.850 [DROP] Dropped 607-byte message from 172.22.94.77:8000
+2026-09-24 16:34:54.985 [BW] sent=5034 recv=4945 bytes over 1s
+2026-09-24 16:34:55.075 [DROP] Dropped 607-byte message from 172.22.158.76:8000
+2026-09-24 16:34:55.366 [DROP] Dropped 607-byte message from 172.22.158.78:8000
+2026-09-24 16:34:55.575 [DROP] Dropped 607-byte message from 172.22.158.76:8000
+2026-09-24 16:34:55.606 [DROP] Dropped 608-byte message from 172.22.94.76:8000
+2026-09-24 16:34:55.985 [BW] sent=4856 recv=6072 bytes over 1s
+2026-09-24 16:34:56.075 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:34:56.116 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:34:56.575 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:34:56.606 [DROP] Dropped 608-byte message from 172.22.94.76:8000
+2026-09-24 16:34:56.985 [BW] sent=4864 recv=4254 bytes over 1s
+2026-09-24 16:34:57.105 [DROP] Dropped 608-byte message from 172.22.94.76:8000
+2026-09-24 16:34:57.356 [DROP] Dropped 608-byte message from 172.22.94.76:8000
+2026-09-24 16:34:57.986 [BW] sent=4864 recv=4862 bytes over 1s
+2026-09-24 16:34:58.085 [FAILURE] Detected failure of 172.22.94.75:8000:1790285662080: no heartbeat for 1.003s
+2026-09-24 16:34:58.106 [DROP] Dropped 608-byte message from 172.22.94.76:8000
+2026-09-24 16:34:58.325 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:34:58.867 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:34:58.985 [BW] sent=6072 recv=4256 bytes over 1s
+2026-09-24 16:34:59.082 [DROP] Dropped 606-byte message from 172.22.94.75:8000
+2026-09-24 16:34:59.331 [DROP] Dropped 606-byte message from 172.22.94.75:8000
+2026-09-24 16:34:59.606 [DROP] Dropped 608-byte message from 172.22.94.76:8000
+2026-09-24 16:34:59.616 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:34:59.831 [DROP] Dropped 606-byte message from 172.22.94.75:8000
+2026-09-24 16:34:59.849 [DROP] Dropped 608-byte message from 172.22.94.77:8000
+2026-09-24 16:34:59.986 [BW] sent=3642 recv=4858 bytes over 1s
+2026-09-24 16:35:00.105 [DROP] Dropped 607-byte message from 172.22.94.76:8000
+2026-09-24 16:35:00.356 [DROP] Dropped 607-byte message from 172.22.94.76:8000
+2026-09-24 16:35:00.615 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:35:00.856 [DROP] Dropped 607-byte message from 172.22.94.76:8000
+2026-09-24 16:35:00.985 [BW] sent=4856 recv=4859 bytes over 1s
+2026-09-24 16:35:01.332 [DROP] Dropped 608-byte message from 172.22.94.75:8000
+2026-09-24 16:35:01.616 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:35:01.985 [BW] sent=4856 recv=6078 bytes over 1s
+2026-09-24 16:35:02.085 [MEMBERSHIP] Removed 172.22.94.75:8000:1790285662080 (DEAD)
+2026-09-24 16:35:02.325 [MEMBERSHIP] New member added: 172.22.94.75:8000:1790285662080 (Status: ALIVE)
+2026-09-24 16:35:02.866 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:35:02.986 [BW] sent=4682 recv=3039 bytes over 1s
+2026-09-24 16:35:03.350 [DROP] Dropped 609-byte message from 172.22.94.77:8000
+2026-09-24 16:35:03.582 [DROP] Dropped 607-byte message from 172.22.94.75:8000
+2026-09-24 16:35:03.599 [DROP] Dropped 609-byte message from 172.22.94.77:8000
+2026-09-24 16:35:03.856 [DROP] Dropped 516-byte message from 172.22.94.76:8000
+2026-09-24 16:35:03.985 [BW] sent=4864 recv=4771 bytes over 1s
+2026-09-24 16:35:04.331 [DROP] Dropped 608-byte message from 172.22.94.75:8000
+2026-09-24 16:35:04.985 [BW] sent=4872 recv=4867 bytes over 1s
+2026-09-24 16:35:05.825 [DROP] Dropped 609-byte message from 172.22.158.76:8000
+2026-09-24 16:35:05.985 [BW] sent=4872 recv=5471 bytes over 1s
+2026-09-24 16:35:06.356 [DROP] Dropped 607-byte message from 172.22.94.76:8000
+2026-09-24 16:35:06.599 [DROP] Dropped 608-byte message from 172.22.94.77:8000
+2026-09-24 16:35:06.985 [BW] sent=4872 recv=5470 bytes over 1s
+2026-09-24 16:35:07.325 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:35:07.575 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:35:07.866 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:35:07.985 [BW] sent=4872 recv=5383 bytes over 1s
+2026-09-24 16:35:08.081 [DROP] Dropped 608-byte message from 172.22.94.75:8000
+2026-09-24 16:35:08.099 [DROP] Dropped 608-byte message from 172.22.94.77:8000
+2026-09-24 16:35:08.349 [DROP] Dropped 608-byte message from 172.22.94.77:8000
+2026-09-24 16:35:08.575 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:35:08.606 [DROP] Dropped 609-byte message from 172.22.94.76:8000
+2026-09-24 16:35:08.985 [BW] sent=4872 recv=7300 bytes over 1s
+2026-09-24 16:35:09.075 [DROP] Dropped 608-byte message from 172.22.158.76:8000
+2026-09-24 16:35:09.985 [BW] sent=4878 recv=4263 bytes over 1s
+2026-09-24 16:35:10.349 [DROP] Dropped 610-byte message from 172.22.94.77:8000
+2026-09-24 16:35:10.856 [DROP] Dropped 610-byte message from 172.22.94.76:8000
+2026-09-24 16:35:10.985 [BW] sent=4880 recv=6098 bytes over 1s
+2026-09-24 16:35:11.825 [DROP] Dropped 610-byte message from 172.22.158.76:8000
+2026-09-24 16:35:11.985 [BW] sent=4880 recv=4267 bytes over 1s
+2026-09-24 16:35:12.116 [DROP] Dropped 609-byte message from 172.22.158.78:8000
+2026-09-24 16:35:12.331 [DROP] Dropped 610-byte message from 172.22.94.75:8000
+2026-09-24 16:35:12.356 [DROP] Dropped 610-byte message from 172.22.94.76:8000
+2026-09-24 16:35:12.385 [FAILURE] Detected failure of 172.22.94.77:8000:1790285678598: no heartbeat for 1.059s
+2026-09-24 16:35:12.866 [DROP] Dropped 608-byte message from 172.22.158.78:8000
+2026-09-24 16:35:12.885 [FAILURE] Detected failure of 172.22.94.75:8000:1790285662080: no heartbeat for 1.019s
+2026-09-24 16:35:12.885 [FAILURE] Detected failure of 172.22.94.76:8000:1790285670855: no heartbeat for 1.019s
+2026-09-24 16:35:12.885 [FAILURE] Detected failure of 172.22.158.78:8000:1790285684365: no heartbeat for 1.019s
+2026-09-24 16:35:12.885 [FAILURE] Detected failure of 172.22.158.76:8000:1790285668324: no heartbeat for 1.019s
+2026-09-24 16:35:12.985 [BW] sent=4876 recv=2437 bytes over 1s
+2026-09-24 16:35:13.082 [DROP] Dropped 610-byte message from 172.22.94.75:8000
+2026-09-24 16:35:13.985 [BW] sent=0 recv=3043 bytes over 1s
+2026-09-24 16:35:14.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:15.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:16.485 [MEMBERSHIP] Removed 172.22.94.77:8000:1790285678598 (DEAD)
+2026-09-24 16:35:16.985 [MEMBERSHIP] Removed 172.22.94.75:8000:1790285662080 (DEAD)
+2026-09-24 16:35:16.986 [MEMBERSHIP] Removed 172.22.94.76:8000:1790285670855 (DEAD)
+2026-09-24 16:35:16.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:16.986 [MEMBERSHIP] Removed 172.22.158.78:8000:1790285684365 (DEAD)
+2026-09-24 16:35:16.986 [MEMBERSHIP] Removed 172.22.158.76:8000:1790285668324 (DEAD)
+2026-09-24 16:35:17.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:18.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:19.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:20.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:21.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:22.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:23.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:24.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:25.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:26.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:27.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:28.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:29.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:30.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:31.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:32.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:33.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:34.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:35.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:36.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:37.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:38.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:39.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:40.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:41.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:42.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:43.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:44.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:45.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:46.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:47.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:48.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:49.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:50.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:51.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:52.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:53.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:54.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:55.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:56.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:57.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:58.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:35:59.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:00.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:01.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:02.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:03.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:04.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:05.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:06.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:07.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:08.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:09.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:10.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:11.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:12.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:13.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:14.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:15.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:16.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:17.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:18.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:19.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:20.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:21.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:22.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:23.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:24.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:25.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:26.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:27.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:28.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:29.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:30.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:31.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:32.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:33.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:34.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:35.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:36.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:37.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:38.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:39.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:40.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:41.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:42.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:43.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:44.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:45.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:46.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:47.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:48.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:49.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:50.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:51.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:52.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:53.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:54.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:55.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:56.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:57.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:58.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:36:59.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:00.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:01.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:02.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:03.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:04.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:05.986 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:06.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:07.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:08.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:09.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:10.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:11.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:12.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:13.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:14.985 [BW] sent=0 recv=0 bytes over 1s
+2026-09-24 16:37:15.985 [BW] sent=0 recv=0 bytes over 1s

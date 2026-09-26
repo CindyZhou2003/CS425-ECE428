@@ -96,8 +96,7 @@ NODE_FLAGS="-nosuspect -drop 5" ./vm.sh run # with pure Gossip(another run)
 sleep 2000 # wait for 2000s
 ./vm.sh fetch  # save VM logs into ./logs
 ./analyze.py logs  # analyze bandwidth, false positive rate, detection times
-
- # rename and save log dir
+mv logs logs-fp-suspect-30 # rename and save log dir
 ./analyze.py logs --since 14:05:00 --until 14:10:00   # one trial out of a longer run
 ```
 
