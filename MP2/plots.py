@@ -60,6 +60,34 @@ def bandwidth_point(logs):
     return mean(samples), stdev(samples)
 
 
+# Drop rates whose no-failure runs logged no false positives in either mode, run without local logs
+ZERO_FP_DROPS = [0]
+
+
+# Reads the analyze.py summaries pasted into data.txt, since some runs have no local logs
+# Returns {mode: {drop: (per-VM B/s means, failures, window seconds)}}
+def summaries():
+    blocks, cur = [], None
+    for line in (HERE / "data.txt").read_text().splitlines():
+        if "== bandwidth" in line:
+            nums = re.findall(r"\d+", line)
+            cur = {"drop": int(nums[-1]) if nums else None, "vms": [], "sus": 0}
+            blocks.append(cur)
+        elif cur is not None:
+            if m := re.match(r"\s+VM \d+\s+([\d.]+) B/s", line):
+                cur["vms"].append(float(m.group(1)))
+            elif m := re.search(r"(suspicions|failures)\s+(\d+)", line):
+                cur[{"suspicions": "sus", "failures": "fail"}[m.group(1)]] = int(m.group(2))
+            elif m := re.search(r"window (\d+)s", line):
+                cur["win"] = int(m.group(1))
+    out = {mode: {} for mode in MODES}
+    for b in blocks:
+        # Detection runs have no drop rate in their header; headers can mislabel the mode, suspicions can't
+        if b["drop"] is not None:
+            out["suspect" if b["sus"] else "gossip"][b["drop"]] = (b["vms"], b["fail"], b["win"])
+    return out
+
+
 # Readings are group-wide [FAILURE] rates over equal slices of the run
 def fp_point(logs, tag):
     lo, hi = steady(logs)
@@ -148,36 +176,54 @@ def main():
     plt.rcParams.update({"font.size": 9, "figure.figsize": (3.4, 2.4)})
     timeline(out)
 
+    # Both plots read the same no-failure runs, one per drop rate
+    fp_logs = {mode: dict((d, load(path)) for d, path in runs("fp", mode)) for mode in MODES}
+    summary = summaries()
+    # Nudges the two modes apart so their error bars don't overlap
+    nudge = {"gossip": -0.4, "suspect": 0.4}
+
     fig, ax = plt.subplots()
-    print("== bandwidth (B/s per node, sent+recv) ==")
+    print("== background bandwidth (B/s per node, sent+recv; readings are the 10 per-VM means) ==")
     for mode in MODES:
-        pts = [(n, *bandwidth_point(load(d))) for n, d in runs("bw", mode)]
-        for n, m, s in pts:
-            print(f"  {mode:8} N={n:<3} {m:9.1f} +- {s:.1f}")
+        pts = [(d, mean(vms), stdev(vms)) for d, (vms, _, _) in sorted(summary[mode].items())]
+        for d, m, s in pts:
+            print(f"  {mode:8} drop={d:<3}% {m:9.1f} +- {s:.1f}")
         if pts:
-            series(ax, *zip(*pts), mode)
-    # Expected sent+recv: 8 messages/s each way, each a header plus one entry per member, sizes read off [DROP] lines
-    ns = range(2, 11)
-    ax.plot(ns, [16 * (58 + 94 * n) for n in ns], color="#8a8a85", linewidth=0.8, linestyle=":", label="Model")
-    style(ax, "Group size N (VMs)", "Bandwidth per node (KB/s)")
+            series(ax, [d + nudge[mode] for d, _, _ in pts], [m for _, m, _ in pts], [s for *_, s in pts], mode)
+    # Expected sent+recv at N=10: 8 messages/s each way, each a header plus one entry per member
+    ax.axhline(16 * (58 + 94 * 10), color="#8a8a85", linewidth=0.8, linestyle=":", label="Model (N=10)")
+    ax.set_ylim(0, 22000)
+    style(ax, "Receiver drop rate (%)", "Bandwidth per node (KB/s)")
+    ax.legend(frameon=False, fontsize=7, loc="lower left")
     ax.yaxis.set_major_formatter(lambda v, _: f"{v / 1000:g}")
     fig.savefig(out / "bandwidth.pdf", bbox_inches="tight")
+    fig.savefig(out / "bandwidth.png", bbox_inches="tight", dpi=200)
 
     fig, ax = plt.subplots()
     print("== false positives (group-wide [FAILURE] lines/s) ==")
     for mode in MODES:
-        pts = []
-        for d, path in runs("fp", mode):
-            m, s, secs = fp_point(load(path), "[FAILURE]")
-            print(f"  {mode:8} drop={d:<3}% {m:.4f} +- {s:.4f} over {secs:.0f}s")
-            pts.append((d, m, s))
-        if pts:
-            series(ax, *zip(*pts), mode)
+        pts = {d: (0.0, 0.0, "no false positives") for d in ZERO_FP_DROPS}
+        # A run without logs can stand in only with zero failures, where every slice is exactly 0
+        for d, (_, fails, secs) in summary[mode].items():
+            if fails == 0:
+                pts[d] = (0.0, 0.0, f"0 over {secs}s, data.txt")
+        for d, logs in fp_logs[mode].items():
+            m, s, secs = fp_point(logs, "[FAILURE]")
+            pts[d] = (m, s, f"over {secs:.0f}s")
+        for d, (m, s, note) in sorted(pts.items()):
+            print(f"  {mode:8} drop={d:<3}% {m:.4f} +- {s:.4f}  {note}")
+        xs = sorted(pts)
+        series(ax, [d + nudge[mode] for d in xs], [pts[d][0] for d in xs], [pts[d][1] for d in xs], mode)
     style(ax, "Receiver drop rate (%)", "False positives / s (group)")
+    ax.legend(frameon=False, fontsize=7, loc="upper left")
     fig.savefig(out / "false_positives.pdf", bbox_inches="tight")
+    fig.savefig(out / "false_positives.png", bbox_inches="tight", dpi=200)
 
     fig, ax = plt.subplots()
     print("== detection time (s) ==")
+    # Nudges the two modes apart so their error bars don't overlap
+    shift = {"gossip": -0.06, "suspect": 0.06}
+    stats = {}
     for mode in MODES:
         path = HERE / f"logs-detect-{mode}"
         if not path.exists():
@@ -188,16 +234,51 @@ def main():
         last = [[l for _, l in by_k[k]] for k in ks]
         for k, f, l in zip(ks, first, last):
             print(f"  {mode:8} k={k} first {mean(f):.3f} +- {stdev(f):.3f}  all {mean(l):.3f} +- {stdev(l):.3f}  n={len(f)}")
+            stats.setdefault(k, {})[mode] = (mean(f), stdev(f), mean(l), stdev(l), len(f))
         name = MODES[mode][0]
-        series(ax, ks, [mean(l) for l in last], [stdev(l) for l in last], mode, f"{name}, all detected")
-        series(ax, ks, [mean(f) for f in first], [stdev(f) for f in first], mode, f"{name}, first detected",
+        xs = [k + shift[mode] for k in ks]
+        series(ax, xs, [mean(l) for l in last], [stdev(l) for l in last], mode, f"{name}, all detected")
+        series(ax, xs, [mean(f) for f in first], [stdev(f) for f in first], mode, f"{name}, first detected",
                markerfacecolor="white")
     ax.set_xticks(range(1, 6))
-    ax.set_ylim(0, 6.5)
+    ax.set_xlim(0.6, 5.4)
+    ax.set_ylim(0, 4)
+    # Marks the failures past the spec's three-at-once guarantee
+    ax.axvspan(3.5, 5.4, color="#f2f1ec", zorder=0)
+    ax.text(4.45, 0.25, "beyond spec", ha="center", fontsize=7, color="#8a8a85")
     ax.axhline(3, color="#8a8a85", linewidth=0.8, linestyle=":")
-    ax.axhline(6, color="#8a8a85", linewidth=0.8, linestyle=":")
+    ax.text(0.65, 3.07, "3 s first-detection bound", fontsize=7, color="#8a8a85")
     style(ax, "Simultaneous failures", "Detection time (s)")
+    ax.legend(frameon=False, fontsize=7, ncol=2, loc="lower left", bbox_to_anchor=(0, 0.1))
     fig.savefig(out / "detection.pdf", bbox_inches="tight")
+    fig.savefig(out / "detection.png", bbox_inches="tight", dpi=200)
+    detection_table(stats, out)
+
+
+# Same numbers as the detection plot, for the report to \\input
+def detection_table(stats, out):
+    cell = lambda m, s: f"{m:.3f} $\\pm$ {s:.3f}"
+    rows = []
+    for k in sorted(stats):
+        vals = []
+        for mode in MODES:
+            if mode in stats[k]:
+                fm, fs, lm, ls, _ = stats[k][mode]
+                vals += [cell(fm, fs), cell(lm, ls)]
+            else:
+                vals += ["--", "--"]
+        rows.append(f"{k} & {stats[k][next(iter(stats[k]))][4]} & " + " & ".join(vals) + r" \\")
+    (out / "detection_table.tex").write_text("\n".join([
+        r"\begin{tabular}{cc|cc|cc}",
+        r"\hline",
+        r" & & \multicolumn{2}{c|}{Gossip} & \multicolumn{2}{c}{Gossip+S} \\",
+        r"$k$ & trials & first (s) & all (s) & first (s) & all (s) \\",
+        r"\hline",
+        *rows,
+        r"\hline",
+        r"\end{tabular}",
+        "",
+    ]))
 
 
 main()

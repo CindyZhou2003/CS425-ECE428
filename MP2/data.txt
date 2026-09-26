@@ -1,7 +1,4 @@
-Droprate=5%
-suspect
-
-== bandwidth ==
+== bandwidth suspect 5%==
   VM 1     15646.7 B/s over 1753s
   VM 10    15768.6 B/s over 1745s
   VM 2     15877.6 B/s over 1753s
@@ -19,10 +16,9 @@ suspect
   suspicions 6689  -> 3.8136/s group, 0.3814/s per node
   failures   17  -> 0.0097/s group, 0.0010/s per node
 
-Droprate=10%
-suspect
 
-== bandwidth ==
+
+== bandwidth suspect 10%==
   VM 1     15709.0 B/s over 1369s
   VM 10    15813.7 B/s over 1357s
   VM 2     15691.1 B/s over 1367s
@@ -46,7 +42,7 @@ suspect
 (base) amazinguknow@vpnmfapool-10-251-160-108 MP2 % ./analyze.py logs                
 10 logs from logs
 
-== bandwidth ==
+== bandwidth suspect 20%==
   VM 1     15277.0 B/s over 664s
   VM 10    15616.9 B/s over 655s
   VM 2     15324.8 B/s over 663s
@@ -65,10 +61,7 @@ suspect
   failures   70  -> 0.1052/s group, 0.0105/s per node
 
   
-Droprate=30%
-suspect
-
-== bandwidth ==
+== bandwidth gossip droprate 30%==
   VM 1     15070.5 B/s over 413s
   VM 10    15407.5 B/s over 398s
   VM 2     10891.9 B/s over 411s
@@ -109,7 +102,7 @@ suspect
   suspicions 1411  -> 2.3131/s group, 0.2313/s per node
   failures   231  -> 0.3787/s group, 0.0379/s per node
 
-== detection time ==
+== detection time gossip+s==
   k=1 VM 2 killed at 22:06:32.400000: 9 detectors, first 2.387s, mean 2.480s, last 2.634s
   k=1 VM 3 killed at 22:07:06.534000: 9 detectors, first 2.519s, mean 2.582s, last 2.662s
   k=1 VM 4 killed at 22:07:40.204000: 9 detectors, first 2.084s, mean 2.258s, last 2.579s
@@ -164,7 +157,7 @@ suspect
   suspicions 0  -> 0.0000/s group, 0.0000/s per node
   failures   230  -> 0.3859/s group, 0.0386/s per node
 
-== detection time ==
+== detection time gossip==
   k=1 VM 2 killed at 18:16:49.500000: 9 detectors, first 2.518s, mean 2.686s, last 2.823s
   k=1 VM 3 killed at 18:17:24.172000: 9 detectors, first 2.346s, mean 2.452s, last 2.569s
   k=1 VM 4 killed at 18:17:59.106000: 9 detectors, first 2.468s, mean 2.554s, last 2.712s
@@ -203,29 +196,27 @@ suspect
   2       5     2.406s / 0.048s         2.631s / 0.074s     2.720s
   3       5     2.452s / 0.066s         2.847s / 0.151s     3.058s
 
-Droprate=30%
-nonsuspect
 
-== bandwidth ==
-  VM 1     15501.1 B/s over 1030s
-  VM 10    15787.1 B/s over 1016s
-  VM 2     15499.9 B/s over 1029s
-  VM 3     15573.9 B/s over 1027s
-  VM 4     15682.1 B/s over 1026s
-  VM 5     15565.1 B/s over 1024s
-  VM 6     15724.4 B/s over 1022s
-  VM 7     15645.3 B/s over 1021s
-  VM 8     15638.8 B/s over 1019s
-  VM 9     15726.4 B/s over 1017s
-  per node: mean 15634.4 B/s, group 156344.2 B/s, n=10
+== bandwidth gossip droprate 30%==
+  VM 1     15790.6 B/s over 6650s
+  VM 10    15831.0 B/s over 6642s
+  VM 2     15817.3 B/s over 6649s
+  VM 3     15766.5 B/s over 6649s
+  VM 4     15854.8 B/s over 6647s
+  VM 5     15828.7 B/s over 6646s
+  VM 6     15823.9 B/s over 6645s
+  VM 7     15849.8 B/s over 6644s
+  VM 8     15854.0 B/s over 6643s
+  VM 9     15861.3 B/s over 6643s
+  per node: mean 15827.8 B/s, group 158277.9 B/s, n=10
 
 == false positives (no-failure run) ==
-  window 1031s over 10 nodes
+  window 6651s over 10 nodes
   suspicions 0  -> 0.0000/s group, 0.0000/s per node
-  failures   0  -> 0.0000/s group, 0.0000/s per node
+  failures   3  -> 0.0005/s group, 0.0000/s per node
 
 
-  == bandwidth ==              #droprate 20
+  == bandwidth == #gossip droprate 20
   VM 1     15485.4 B/s over 999s
   VM 10    15648.3 B/s over 989s
   VM 2     15556.4 B/s over 997s
@@ -243,7 +234,7 @@ nonsuspect
   suspicions 0  -> 0.0000/s group, 0.0000/s per node
   failures   0  -> 0.0000/s group, 0.0000/s per node
 
-  == bandwidth ==              #droprate 10
+  == bandwidth ==   # gossip droprate 10
   VM 1     15419.5 B/s over 1273s
   VM 10    15636.5 B/s over 1261s
   VM 2     15622.1 B/s over 1273s
@@ -260,3 +251,23 @@ nonsuspect
   window 1274s over 10 nodes
   suspicions 0  -> 0.0000/s group, 0.0000/s per node
   failures   0  -> 0.0000/s group, 0.0000/s per node
+
+
+== bandwidth gossip droprate 5%==
+  VM 1     15633.1 B/s over 9947s
+  VM 10    15821.9 B/s over 9711s
+  VM 2     15763.7 B/s over 9779s
+  VM 3     15766.6 B/s over 9791s
+  VM 4     15889.2 B/s over 9515s
+  VM 5     15835.1 B/s over 9554s
+  VM 6     15524.1 B/s over 9976s
+  VM 7     15746.7 B/s over 9805s
+  VM 8     15837.4 B/s over 9657s
+  VM 9     15626.3 B/s over 9921s
+  per node: mean 15744.4 B/s, group 157444.1 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 9978s over 10 nodes
+  suspicions 0  -> 0.0000/s group, 0.0000/s per node
+  failures   0  -> 0.0000/s group, 0.0000/s per node
+
