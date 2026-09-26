@@ -223,3 +223,38 @@ nonsuspect
   window 177s over 10 nodes
   suspicions 0  -> 0.0000/s group, 0.0000/s per node
   failures   127  -> 0.7175/s group, 0.0ç718/s per node
+
+  = bandwidth == suspect 10
+  VM 1     14513.6 B/s over 165s
+  VM 10    15461.2 B/s over 151s
+  VM 2     15070.9 B/s over 163s
+  VM 3     14810.5 B/s over 162s
+  VM 4     14969.2 B/s over 160s
+  VM 5     15055.7 B/s over 159s
+  VM 6     15392.4 B/s over 157s
+  VM 7     15468.6 B/s over 156s
+  VM 8     15449.2 B/s over 154s
+  VM 9     15520.5 B/s over 153s
+  per node: mean 15171.2 B/s, group 151711.7 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 166s over 10 nodes
+  suspicions 0  -> 0.0000/s group, 0.0000/s per node
+  failures   0  -> 0.0000/s group, 0.0000/s per node
+
+  == bandwidth == droprate 20
+  VM 1     15093.0 B/s over 447s
+  VM 10    15779.0 B/s over 432s
+  VM 2     15121.9 B/s over 444s
+  VM 3     15479.3 B/s over 442s
+  VM 4     15541.6 B/s over 440s
+  VM 5     15335.3 B/s over 440s
+  VM 6     15410.6 B/s over 439s
+  VM 7     15588.9 B/s over 436s
+  VM 8     15696.3 B/s over 434s
+  VM 9     15651.6 B/s over 434s
+  per node: mean 15469.8 B/s, group 154697.6 B/s, n=10
+
+== false positives (no-failure run) ==
+  window 448s over 10 nodes
+  suspicions 0  -> 0.0000/s group, 0.0000/s per node
