@@ -60,10 +60,6 @@ def bandwidth_point(logs):
     return mean(samples), stdev(samples)
 
 
-# Drop rates whose no-failure runs logged no false positives in either mode, run without local logs
-ZERO_FP_DROPS = [0]
-
-
 # Reads the analyze.py summaries pasted into data.txt, since some runs have no local logs
 # Returns {mode: {drop: (per-VM B/s means, failures, window seconds)}}
 def summaries():
@@ -202,7 +198,7 @@ def main():
     fig, ax = plt.subplots()
     print("== false positives (group-wide [FAILURE] lines/s) ==")
     for mode in MODES:
-        pts = {d: (0.0, 0.0, "no false positives") for d in ZERO_FP_DROPS}
+        pts = {}
         # A run without logs can stand in only with zero failures, where every slice is exactly 0
         for d, (_, fails, secs) in summary[mode].items():
             if fails == 0:
