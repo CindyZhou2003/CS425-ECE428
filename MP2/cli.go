@@ -41,7 +41,7 @@ func runNode(args []string) {
 	port := fs.Int("port", gossipPort, "UDP port to gossip on")
 	introducer := fs.String("introducer", introducerAddr(), "introducer host:port")
 	logFile := fs.String("log", defaultLogFile(), "log file")
-	nosuspect := fs.Bool("nosuspect", false, "start with the suspicion mechanism off")
+	nosuspect := fs.Bool("nosuspect", true, "start with the suspicion mechanism off")
 	daemon := fs.Bool("daemon", false, "run without the command prompt, until killed")
 	drop := fs.Float64("drop", 0, "percentage of incoming messages to drop from the start")
 	fs.Parse(args)
